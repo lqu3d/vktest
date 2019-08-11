@@ -18,6 +18,27 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="AppMain.cpp" />
+    <ClCompile Include="DrawCube.cpp" />
+    <ClCompile Include="XGame.cpp" />
+    <ClCompile Include="XGameMgr.cpp" />
+    <ClCompile Include="XModel.cpp" />
+    <ClCompile Include="XObject.cpp" />
+    <ClCompile Include="XObjectMgr.cpp" />
+    <ClCompile Include="XVulkan.cpp" />
+    <ClCompile Include="XWindow.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="DrawCube.h" />
+    <ClInclude Include="XGame.h" />
+    <ClInclude Include="XGameMgr.h" />
+    <ClInclude Include="XModel.h" />
+    <ClInclude Include="XObject.h" />
+    <ClInclude Include="XObjectMgr.h" />
+    <ClInclude Include="XVulkan.h" />
+    <ClInclude Include="XWindow.h" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <ProjectGuid>{FB1F79E2-05A0-45DA-86B4-9A2F8098AD70}</ProjectGuid>
@@ -88,9 +109,10 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <SDLCheck>true</SDLCheck>
+      <SDLCheck>false</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>%VULKAN_SDK%\include;..\libs;..\libs\glfw\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -149,22 +171,6 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="DrawCube.cpp" />
-    <ClCompile Include="test.cpp" />
-    <ClCompile Include="XGame.cpp" />
-    <ClCompile Include="XModel.cpp" />
-    <ClCompile Include="XVulkan.cpp" />
-    <ClCompile Include="XWindow.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="DrawCube.h" />
-    <ClInclude Include="model.h" />
-    <ClInclude Include="XGame.h" />
-    <ClInclude Include="XModel.h" />
-    <ClInclude Include="XVulkan.h" />
-    <ClInclude Include="XWindow.h" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

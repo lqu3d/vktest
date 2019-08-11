@@ -1,20 +1,35 @@
 #pragma once
 #include <iostream>
+
+#include "DrawCube.h"
+
 class XGame
 {
 public:
 	void Start() {
-		std::cout << ":start" << std::endl;
+		SetupCamera();
+
+		auto obj = objMgr.AddObject();
+		
 	}
 
 	void Update() {
-		std::cout << ":update" << std::endl;
-
+		
 	}
 
 	void OnDestroy() {
-		std::cout << ":destroy" << std::endl;
+		
+	}
+
+	void SetupCamera() {
+		//float fov = glm::radians(45.0f);
+		//float wdh = xvk.xWnd.width * 1.0f / xvk.xWnd.height;
+		//float hdw = xvk.xWnd.height * 1.0f / xvk.xWnd.width;
+		//fov *= wdh;
 
 	}
 };
+
+
+
 

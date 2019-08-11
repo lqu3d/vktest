@@ -15,16 +15,13 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="test.cpp">
+    <ClCompile Include="AppMain.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="XWindow.cpp">
+    <ClCompile Include="XGameMgr.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="XVulkan.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="XModel.cpp">
+    <ClCompile Include="XObject.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="DrawCube.cpp">
@@ -33,24 +30,42 @@
     <ClCompile Include="XGame.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="XObjectMgr.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="XModel.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="XVulkan.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="XWindow.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="XWindow.h">
+    <ClInclude Include="XGameMgr.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="XVulkan.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="model.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="XModel.h">
+    <ClInclude Include="XObject.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="DrawCube.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="XGame.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="XObjectMgr.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="XModel.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="XVulkan.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="XWindow.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
