@@ -9,7 +9,7 @@ public:
 	void Start() {
 		SetupCamera();
 
-		auto obj = objMgr.AddObject();
+		auto obj = objMgr.AddObject<DrawCube>();
 		
 	}
 

@@ -25,7 +25,7 @@ void XGameMgr::Start()
 	xvk.BeginCmdBuffer();
 
 	xgame.Start();
-
+	objMgr.Start();
 
 	xvk.EndCmdBuffer();
 }
@@ -35,16 +35,18 @@ void XGameMgr::Loop()
 	while (!xvk.xWnd.ShouldClose()) {
 		xvk.xWnd.PollEvents();
 		xgame.Update();
+		objMgr.Update();
 	}
 }
 
 void XGameMgr::Clear()
 {
-
+	objMgr.Clear();
 }
 
 void XGameMgr::Destroy()
 {
+	objMgr.OnDestroy();
 	xgame.OnDestroy();
 	xvk.Destroy();
 }

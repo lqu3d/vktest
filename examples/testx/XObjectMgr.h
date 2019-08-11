@@ -7,6 +7,7 @@ class XObjectMgr
 {
 private:
 
+	friend class XGameMgr;
 	/*** vector对象声明为指针的好处：
 	*vector的内存仅在析构时才能被释放(使用swap除外)，指针可以随时被delete，促使vector内存的释放
 	*如果vector声明为对象，则只要游戏不结束vector的内存就无法被释放，且会越来越大
@@ -14,7 +15,7 @@ private:
 	*/
 	std::vector<XObject*>* pObjList = new std::vector<XObject*>();
 public:
-	XObject* AddObject();
+	template<typename T> T* AddObject();
 
 	void DestroyObject(XObject* pObj);
 protected:
@@ -23,5 +24,23 @@ protected:
 	void Update();
 
 	void Clear();
+
+	void OnDestroy();
 };
 
+
+/*** 只有AddObject，不提供GetObject的操作，上层逻辑自己保存指针，这是比较现代的模式
+* 为了提高遍历效率，可以考虑每AddObject一次排一次序
+*/
+template<typename T>
+inline T* XObjectMgr::AddObject()
+{
+	XObject* obj = new T();
+	if (obj == NULL)
+		return NULL;
+
+	pObjList->push_back(obj);
+	obj->OnStart();
+
+	return (T*)obj;
+}

@@ -1,16 +1,5 @@
 #include "XObject.h"
 
-/*** 只有AddObject，不提供GetObject的操作，上层逻辑自己保存指针，这是比较现代的模式
-* 为了提高遍历效率，可以考虑每AddObject一次排一次序
-*/
-XObject* XObjectMgr::AddObject()
-{
-	auto pobj = new XObject();
-	pobj->OnStart();
-	pObjList->push_back(pobj);
-
-	return pobj;
-}
 
 /***
 *这里在回收时要不要做对象池处理？
@@ -62,3 +51,8 @@ void XObjectMgr::Clear()
 	//调用delete，强制vector调用析构函数释放内存
 	X_OBJ_RELEASE(pObjList);
 }
+
+void XObjectMgr::OnDestroy()
+{
+}
+
