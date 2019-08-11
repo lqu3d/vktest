@@ -1,6 +1,8 @@
 #include "XVulkan.h"
 #include"XWindow.h"
+#include "XModel.h"
 
+XVulkan xvk;
 void XVulkan::InitInstance()
 {
 	//surface扩展是最基本的，没有此扩展将无法创建surface，也就无法进行任何的后续工作
@@ -261,10 +263,6 @@ void XVulkan::InitDepthBuffer()
 
 }
 
-void XVulkan::InitUniformBuffer()
-{
-
-}
 
 bool XVulkan::memory_type_from_properties(uint32_t typeBits, VkFlags requirements_mask, uint32_t* typeIndex) {
 	vkGetPhysicalDeviceMemoryProperties(vkPhyDevice, &vkPhyDevMemProps);
@@ -347,6 +345,18 @@ void XVulkan::CreateBuffer(UINT size, VkBufferUsageFlagBits usage, VkMemoryPrope
 	ret = vkBindBufferMemory(vkDevice, xvkBuffer.info.buffer, xvkBuffer.mem, 0);
 	CheckResult(ret);
 
+
+}
+
+void XVulkan::WriteBuffer(XVkBuffer xvkBuffer, void* pdata, UINT size, UINT offset) {
+
+	UINT64* pdat;
+	auto ret = vkMapMemory(vkDevice, xvkBuffer.mem, offset, size, 0, (void**)&pdat);
+	CheckResult(ret);
+
+	memcpy(pdat, pdata, size);
+
+	vkUnmapMemory(vkDevice, xvkBuffer.mem);
 
 }
 

@@ -81,12 +81,14 @@ LRESULT CALLBACK XWindow::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 
 	switch (uMsg) {
 	case WM_CLOSE:
-		//PostQuitMessage(0);
 		shouldClose = true;
 		break;
-	case WM_PAINT:
-		//run(info);
-		return 0;
+
+	//case WM_PAINT:
+		/*** 很危险的做法 ！！！！！
+		*注意如果return掉，不给后面DefWindowProc处理则windows不知道此消息已处理完成，它会不停的继续发送WM_PAINT
+		*/
+		//return;
 	default:
 		break;
 	}

@@ -150,11 +150,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="DrawCube.cpp" />
     <ClCompile Include="test.cpp" />
+    <ClCompile Include="XGame.cpp" />
+    <ClCompile Include="XModel.cpp" />
     <ClCompile Include="XVulkan.cpp" />
     <ClCompile Include="XWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="DrawCube.h" />
+    <ClInclude Include="model.h" />
+    <ClInclude Include="XGame.h" />
+    <ClInclude Include="XModel.h" />
     <ClInclude Include="XVulkan.h" />
     <ClInclude Include="XWindow.h" />
   </ItemGroup>

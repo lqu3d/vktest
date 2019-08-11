@@ -8,6 +8,8 @@
 #include <vector>
 #include "XWindow.h"
 
+#include "glm/glm.hpp"
+
 #pragma region struct
 struct XVkDepth {
 	VkFormat format;
@@ -20,6 +22,16 @@ struct XVkBuffer {
 	VkDescriptorBufferInfo info;
 	VkDeviceMemory mem;
 };
+
+struct XVKCamera {
+	glm::vec3 pos; //相机位置
+	glm::vec3 lookAt; //看哪个点
+	glm::vec3 up; //相机的上方向向量
+
+	glm::mat4 tmView;
+	glm::mat4 tmProjection;
+};
+
 #pragma endregion
 
 class XVulkan
@@ -47,6 +59,7 @@ public:
 	std::vector<VkPhysicalDevice> gpus;
 
 
+	XVKCamera vkMainCamera;
 private:
 
 	void InitInstance();
@@ -64,7 +77,6 @@ private:
 
 	bool memory_type_from_properties(uint32_t typeBits, VkFlags requirements_mask, uint32_t* typeIndex);
 
-	void InitUniformBuffer();
 
 public:
 
@@ -72,6 +84,9 @@ public:
 
 	void CreateBuffer(UINT size, VkBufferUsageFlagBits usage, VkMemoryPropertyFlagBits memMask, OUT XVkBuffer& xvkBuffer);
 
+	void WriteBuffer(XVkBuffer xvkBuffer, void* pdata, UINT size, UINT offset);
+
+	
 	void BeginCmdBuffer();
 	void EndCmdBuffer();
 
@@ -85,4 +100,6 @@ private:
 
 
 };
+
+extern XVulkan xvk;
 
