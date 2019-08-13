@@ -42,6 +42,15 @@
     <ClCompile Include="XWindow.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="XGameObject.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="XUtils.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="XComponent.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="XGameMgr.h">
@@ -66,6 +75,15 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="XWindow.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="XGameObject.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="XUtils.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="XComponent.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

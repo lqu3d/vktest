@@ -1,6 +1,5 @@
 #include "XObject.h"
 
-XObjectMgr objMgr;
 
 void XObject::OnStart()
 {

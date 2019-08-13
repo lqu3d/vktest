@@ -1,5 +1,8 @@
 #include "XObject.h"
+#include "XObjectMgr.h"
+#include "XUtils.h"
 
+XObjectMgr objMgr;
 
 /***
 *这里在回收时要不要做对象池处理？
@@ -20,6 +23,23 @@ void XObjectMgr::DestroyObject(XObject* pObj)
 	}
 }
 
+bool XObjectMgr::HasObject(XObject* pObj)
+{
+	if (pObj == NULL)
+		return false;
+
+	for (size_t i = 0; i < pObjList->size(); i++)
+	{
+		if ((*pObjList)[i] == pObj)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+#pragma region protected
 void XObjectMgr::Start()
 {
 	pObjList->reserve(1000);
@@ -47,7 +67,7 @@ void XObjectMgr::Clear()
 	}
 
 	pObjList->clear();
-	
+
 	//调用delete，强制vector调用析构函数释放内存
 	X_OBJ_RELEASE(pObjList);
 }
@@ -55,4 +75,7 @@ void XObjectMgr::Clear()
 void XObjectMgr::OnDestroy()
 {
 }
+#pragma endregion
+
+
 

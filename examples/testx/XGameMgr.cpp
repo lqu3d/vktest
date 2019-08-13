@@ -1,6 +1,7 @@
 #include "XGameMgr.h"
 #include "XVulkan.h"
 #include "XGame.h"
+#include "XObjectMgr.h"
 
 XGame xgame;
 
@@ -24,8 +25,9 @@ void XGameMgr::Start()
 
 	xvk.BeginCmdBuffer();
 
-	xgame.Start();
 	objMgr.Start();
+	xgame.Start();
+	
 
 	xvk.EndCmdBuffer();
 }
@@ -34,8 +36,9 @@ void XGameMgr::Loop()
 {
 	while (!xvk.xWnd.ShouldClose()) {
 		xvk.xWnd.PollEvents();
-		xgame.Update();
+
 		objMgr.Update();
+		xgame.Update();
 	}
 }
 

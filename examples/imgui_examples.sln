@@ -13,6 +13,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test-glfw", "testx-glfw\tes
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "api-samples", "api-samples\api-samples.vcxproj", "{341476AF-6ADC-406B-B0AC-AB6AE9E8AF98}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "temptest", "temptest\temptest.vcxproj", "{CA651E98-E7E7-4428-9F8F-5DF12F1A4FF7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -61,6 +63,14 @@ Global
 		{341476AF-6ADC-406B-B0AC-AB6AE9E8AF98}.Release|Win32.Build.0 = Release|Win32
 		{341476AF-6ADC-406B-B0AC-AB6AE9E8AF98}.Release|x64.ActiveCfg = Release|x64
 		{341476AF-6ADC-406B-B0AC-AB6AE9E8AF98}.Release|x64.Build.0 = Release|x64
+		{CA651E98-E7E7-4428-9F8F-5DF12F1A4FF7}.Debug|Win32.ActiveCfg = Debug|Win32
+		{CA651E98-E7E7-4428-9F8F-5DF12F1A4FF7}.Debug|Win32.Build.0 = Debug|Win32
+		{CA651E98-E7E7-4428-9F8F-5DF12F1A4FF7}.Debug|x64.ActiveCfg = Debug|x64
+		{CA651E98-E7E7-4428-9F8F-5DF12F1A4FF7}.Debug|x64.Build.0 = Debug|x64
+		{CA651E98-E7E7-4428-9F8F-5DF12F1A4FF7}.Release|Win32.ActiveCfg = Release|Win32
+		{CA651E98-E7E7-4428-9F8F-5DF12F1A4FF7}.Release|Win32.Build.0 = Release|Win32
+		{CA651E98-E7E7-4428-9F8F-5DF12F1A4FF7}.Release|x64.ActiveCfg = Release|x64
+		{CA651E98-E7E7-4428-9F8F-5DF12F1A4FF7}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

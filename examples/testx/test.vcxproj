@@ -21,21 +21,27 @@
   <ItemGroup>
     <ClCompile Include="AppMain.cpp" />
     <ClCompile Include="DrawCube.cpp" />
+    <ClCompile Include="XComponent.cpp" />
     <ClCompile Include="XGame.cpp" />
     <ClCompile Include="XGameMgr.cpp" />
+    <ClCompile Include="XGameObject.cpp" />
     <ClCompile Include="XModel.cpp" />
     <ClCompile Include="XObject.cpp" />
     <ClCompile Include="XObjectMgr.cpp" />
+    <ClCompile Include="XUtils.cpp" />
     <ClCompile Include="XVulkan.cpp" />
     <ClCompile Include="XWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DrawCube.h" />
+    <ClInclude Include="XComponent.h" />
     <ClInclude Include="XGame.h" />
     <ClInclude Include="XGameMgr.h" />
+    <ClInclude Include="XGameObject.h" />
     <ClInclude Include="XModel.h" />
     <ClInclude Include="XObject.h" />
     <ClInclude Include="XObjectMgr.h" />
+    <ClInclude Include="XUtils.h" />
     <ClInclude Include="XVulkan.h" />
     <ClInclude Include="XWindow.h" />
   </ItemGroup>

@@ -1,10 +1,5 @@
 #pragma once
 
-#include "XObjectMgr.h"
-
-#define X_OBJ_RELEASE(x){ delete x; x = NULL;}
-#define X_ARR_RELEASE(x){ delete[] x; x = NULL;}
-
 class XObject
 {
 public:
@@ -15,5 +10,3 @@ public:
 	virtual void OnDestroy();
 
 };
-
-extern XObjectMgr objMgr;
