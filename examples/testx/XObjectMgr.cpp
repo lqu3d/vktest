@@ -16,8 +16,16 @@ void XObjectMgr::DestroyObject(XGameObject* pObj)
 
 	for (auto iter = pObjList->begin(); iter != pObjList->end(); ++iter) {
 		if (*iter._Ptr == pObj) {
+			
+			//step1，从容器中移除
 			pObjList->erase(iter);
-			delete pObj;
+
+			//step2，调用物体自己的销毁处理，以释放物体的各组件
+			pObj->OnDestroy();
+
+			//step3，销毁物体本身
+			X_OBJ_RELEASE(pObj);
+
 			break;
 		}
 	}
@@ -50,30 +58,31 @@ void XObjectMgr::Update()
 	for (size_t i = 0; i < pObjList->size(); i++)
 	{
 		auto po = (*pObjList)[i];
-		if (po) {
-			po->OnUpdate();
-		}
+		po->OnUpdate();
 	}
 }
 
+
+/*** 注意，清空并不是销毁所有东西
+*一般清空是清除游戏数据，但各容器和管理者还在，只是数据清掉了
+*/
 void XObjectMgr::Clear()
 {
 	for (size_t i = 0; i < pObjList->size(); i++)
 	{
 		auto po = (*pObjList)[i];
-		if (po) {
-			po->OnDestroy();
-		}
+		po->OnDestroy();
 	}
 
 	pObjList->clear();
-
-	//调用delete，强制vector调用析构函数释放内存
-	X_OBJ_RELEASE(pObjList);
 }
 
 void XObjectMgr::OnDestroy()
 {
+	Clear();
+
+	//调用delete，强制vector调用析构函数释放内存
+	X_OBJ_RELEASE(pObjList);
 }
 #pragma endregion
 

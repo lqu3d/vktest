@@ -42,6 +42,9 @@ void XGameMgr::Loop()
 	}
 }
 
+/*** 注意，清空并不是销毁所有东西
+*一般清空是清除游戏数据，但各容器和管理者还在，只是数据清掉了
+*/
 void XGameMgr::Clear()
 {
 	objMgr.Clear();
