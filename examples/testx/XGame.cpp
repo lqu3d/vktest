@@ -3,6 +3,7 @@
 #include "XUtils.h"
 
 #include "DrawCube.h"
+#include "XComponent.h"
 
 void XGame::Start()
 {
@@ -23,9 +24,6 @@ void XGame::Start()
 
 	XLogToFile();
 
-	//auto pcom = new XComponent();
-
-	//auto pgo = dynamic_cast<XGameObject*>(pcom);
 }
 
 void XGame::Update()

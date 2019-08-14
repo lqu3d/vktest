@@ -7,11 +7,12 @@
 
 #include "XObject.h"
 
+class XComponent;
 class XGameObject :
 	public XObject
 {
 private:
-	std::vector<XGameObject*>* objList = new std::vector<XGameObject*>();
+	std::vector<XComponent*>* objList = new std::vector<XComponent*>();
 public:
 	template<typename T> T* AddComponent();
 	template<typename T> T* GetComponent();
@@ -27,8 +28,7 @@ public:
 template<typename T>
 inline T* XGameObject::AddComponent()
 {
-	
-	auto go = new T();
+	auto go = new T(this);
 	objList->push_back(go);
 	return go;
 }

@@ -28,6 +28,7 @@
     <ClCompile Include="XModel.cpp" />
     <ClCompile Include="XObject.cpp" />
     <ClCompile Include="XObjectMgr.cpp" />
+    <ClCompile Include="XTransform.cpp" />
     <ClCompile Include="XUtils.cpp" />
     <ClCompile Include="XVulkan.cpp" />
     <ClCompile Include="XWindow.cpp" />
@@ -41,6 +42,7 @@
     <ClInclude Include="XModel.h" />
     <ClInclude Include="XObject.h" />
     <ClInclude Include="XObjectMgr.h" />
+    <ClInclude Include="XTransform.h" />
     <ClInclude Include="XUtils.h" />
     <ClInclude Include="XVulkan.h" />
     <ClInclude Include="XWindow.h" />

@@ -3,5 +3,9 @@
 class XComponent :
 	public XGameObject
 {
+public:
+	XComponent(XGameObject* gameObject);
+public:
+	XGameObject* gameObject = NULL;
 };
 
