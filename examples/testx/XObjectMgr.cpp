@@ -1,4 +1,4 @@
-#include "XObject.h"
+#include "XGameObject.h"
 #include "XObjectMgr.h"
 #include "XUtils.h"
 
@@ -9,7 +9,7 @@ XObjectMgr objMgr;
 *不要，底层要纯粹，让上层可以得到完全的控制，如果做了对象池，上层就控制不了内存的完全释放，就像GC机制一样让人难受
 *如果要做对象池，让上层逻辑去做
 */
-void XObjectMgr::DestroyObject(XObject* pObj)
+void XObjectMgr::DestroyObject(XGameObject* pObj)
 {
 	if (pObj == NULL)
 		return;
@@ -23,7 +23,7 @@ void XObjectMgr::DestroyObject(XObject* pObj)
 	}
 }
 
-bool XObjectMgr::HasObject(XObject* pObj)
+bool XObjectMgr::HasObject(XGameObject* pObj)
 {
 	if (pObj == NULL)
 		return false;

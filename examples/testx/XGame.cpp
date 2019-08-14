@@ -10,7 +10,7 @@ void XGame::Start()
 {
 	SetupCamera();
 
-	auto po = new XObject();
+	auto po = new XGameObject();
 	bool has = objMgr.HasObject(po);
 
 	auto obj = objMgr.AddObject<DrawCube>();

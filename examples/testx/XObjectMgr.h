@@ -5,7 +5,7 @@
 #pragma once
 #include<vector>
 
-class XObject;
+class XGameObject;
 class XObjectMgr
 {
 private:
@@ -16,13 +16,13 @@ private:
 	*如果vector声明为对象，则只要游戏不结束vector的内存就无法被释放，且会越来越大
 	*考虑一个游戏运行几天，可能会由于内存泄漏而宕机
 	*/
-	std::vector<XObject*>* pObjList = new std::vector<XObject*>();
+	std::vector<XGameObject*>* pObjList = new std::vector<XGameObject*>();
 public:
 	template<typename T> T* AddObject();
 
-	void DestroyObject(XObject* pObj);
+	void DestroyObject(XGameObject* pObj);
 
-	bool HasObject(XObject* pObj);
+	bool HasObject(XGameObject* pObj);
 protected:
 	void Start();
 
@@ -43,7 +43,7 @@ extern XObjectMgr objMgr;
 template<typename T>
 inline T* XObjectMgr::AddObject()
 {
-	XObject* obj = new T();
+	XGameObject* obj = new T();
 	if (obj == NULL)
 		return NULL;
 

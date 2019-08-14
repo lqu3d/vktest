@@ -1,8 +1,8 @@
 #pragma once
 
-#include "XObject.h"
+#include "XGameObject.h"
 
-class DrawCube : public XObject
+class DrawCube : public XGameObject
 {
 public:
 	void OnStart() {

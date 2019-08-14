@@ -11,6 +11,7 @@ class XComponent;
 class XGameObject :
 	public XObject
 {
+	friend class XObjectMgr;
 private:
 	std::vector<XComponent*>* objList = new std::vector<XComponent*>();
 public:
@@ -18,9 +19,11 @@ public:
 	template<typename T> T* GetComponent();
 	template<typename T> void RemoveComponent();
 	template<typename T> void RemoveAllComponents();
-
 	void RemoveAllComponents();
-
+protected:
+	virtual void OnStart();
+	virtual void OnUpdate();
+	virtual void OnDestroy();
 };
 
 
