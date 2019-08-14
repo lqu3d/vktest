@@ -1,7 +1,7 @@
 #pragma once
 #include "XComponent.h"
 
-class XTransform : XComponent
+class XTransform : public XComponent
 {
 public:
 	XTransform(XGameObject* gameObject);

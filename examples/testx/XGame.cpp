@@ -4,6 +4,7 @@
 
 #include "DrawCube.h"
 #include "XComponent.h"
+#include "XTransform.h"
 
 void XGame::Start()
 {
@@ -15,6 +16,7 @@ void XGame::Start()
 	auto obj = objMgr.AddObject<DrawCube>();
 	has = objMgr.HasObject(obj);
 
+	
 	objMgr.DestroyObject(obj);
 	has = objMgr.HasObject(obj);
 
@@ -23,6 +25,9 @@ void XGame::Start()
 	bool same2 = XSameType<int, decltype(x)>();
 
 	XLogToFile();
+
+	auto go = new XGameObject();
+	go->AddComponent<XTransform>();
 
 }
 

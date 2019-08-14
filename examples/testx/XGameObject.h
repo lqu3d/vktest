@@ -20,6 +20,7 @@ public:
 	template<typename T> void RemoveAllComponents();
 
 	void RemoveAllComponents();
+
 };
 
 
@@ -28,9 +29,11 @@ public:
 template<typename T>
 inline T* XGameObject::AddComponent()
 {
-	auto go = new T(this);
+	//显式赋值，用于检查T是不是XComponent的子类
+	XComponent* go = new T(this);
+
 	objList->push_back(go);
-	return go;
+	return (T*)go;
 }
 
 template<typename T>
