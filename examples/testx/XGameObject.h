@@ -21,9 +21,9 @@ public:
 	template<typename T> void RemoveAllComponents();
 	void RemoveAllComponents();
 protected:
-	virtual void OnStart();
-	virtual void OnUpdate();
-	virtual void OnDestroy();
+	virtual void OnStart() override;
+	virtual void OnUpdate() override;
+	virtual void OnDestroy() override;
 };
 
 

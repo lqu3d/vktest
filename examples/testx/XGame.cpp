@@ -8,26 +8,9 @@
 
 void XGame::Start()
 {
-	SetupCamera();
-
-	auto po = new XGameObject();
-	bool has = objMgr.HasObject(po);
-
-	auto obj = objMgr.AddObject<DrawCube>();
-	has = objMgr.HasObject(obj);
-
-	
-	objMgr.DestroyObject(obj);
-	has = objMgr.HasObject(obj);
-
-	int x = 20;
-	bool same = XSameType<int, char>();
-	bool same2 = XSameType<int, decltype(x)>();
-
-	XLogToFile();
-
 	auto go = new XGameObject();
 	go->AddComponent<XTransform>();
+
 
 }
 

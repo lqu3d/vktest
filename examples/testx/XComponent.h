@@ -1,11 +1,22 @@
 #pragma once
-#include "XGameObject.h"
+#include "XObject.h"
+
 class XComponent :
-	public XGameObject
+	public XObject
 {
+	friend class XGameObject;
 public:
 	XComponent(XGameObject* gameObject);
 public:
-	XGameObject* gameObject = NULL;
+	XGameObject* gameObject;
+
+protected:
+	// Í¨¹ý XObject ¼Ì³Ð
+	virtual void OnStart() override;
+
+	virtual void OnUpdate() override;
+
+	virtual void OnDestroy() override;
+
 };
 

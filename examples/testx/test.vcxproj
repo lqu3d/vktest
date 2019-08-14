@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClCompile Include="AppMain.cpp" />
     <ClCompile Include="DrawCube.cpp" />
+    <ClCompile Include="XCamera.cpp" />
     <ClCompile Include="XComponent.cpp" />
     <ClCompile Include="XGame.cpp" />
     <ClCompile Include="XGameMgr.cpp" />
@@ -35,6 +36,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DrawCube.h" />
+    <ClInclude Include="XCamera.h" />
     <ClInclude Include="XComponent.h" />
     <ClInclude Include="XGame.h" />
     <ClInclude Include="XGameMgr.h" />
