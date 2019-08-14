@@ -1,8 +1,8 @@
 #pragma once
 
 
-#define X_OBJ_RELEASE(x){ delete x; x = NULL;}
-#define X_ARR_RELEASE(x){ delete[] x; x = NULL;}
+#define X_OBJ_RELEASE(x){ if(x){ delete x; x = NULL;}}
+#define X_ARR_RELEASE(x){ if(x){delete[] x; x = NULL;}}
 
 
 namespace XUtils {
