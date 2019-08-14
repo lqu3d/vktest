@@ -8,7 +8,7 @@ class XComponent :
 public:
 	XComponent(XGameObject* gameObject);
 public:
-	XGameObject* gameObject;
+	XGameObject* const gameObject; //指针不可更改，仅在构造函数的列表中确定其值
 
 protected:
 	// 通过 XObject 继承

@@ -3,14 +3,13 @@
 #include "XUtils.h"
 
 #include "DrawCube.h"
-#include "XComponent.h"
-#include "XTransform.h"
+#include "XCamera.h"
 
 void XGame::Start()
 {
 	auto go = new XGameObject();
-	go->AddComponent<XTransform>();
-
+	XCamera* cam = go->AddComponent<XCamera>();
+	//cam->gameObject.
 
 }
 

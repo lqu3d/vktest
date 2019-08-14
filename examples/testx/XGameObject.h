@@ -14,16 +14,21 @@ class XGameObject :
 	friend class XObjectMgr;
 private:
 	std::vector<XComponent*>* objList = new std::vector<XComponent*>();
+
+protected:
+	virtual void OnStart() override;
+	virtual void OnUpdate() override;
+	virtual void OnDestroy() override;
+
+public:
+
 public:
 	template<typename T> T* AddComponent();
 	template<typename T> T* GetComponent();
 	template<typename T> void RemoveComponent();
 	template<typename T> void RemoveAllComponents();
 	void RemoveAllComponents();
-protected:
-	virtual void OnStart() override;
-	virtual void OnUpdate() override;
-	virtual void OnDestroy() override;
+
 };
 
 

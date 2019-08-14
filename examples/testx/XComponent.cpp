@@ -1,8 +1,8 @@
 #include "XComponent.h"
 
-XComponent::XComponent(XGameObject* gameObject)
+XComponent::XComponent(XGameObject* gameObject):gameObject(gameObject)
 {
-	this->gameObject = gameObject;
+	
 }
 
 void XComponent::OnStart()

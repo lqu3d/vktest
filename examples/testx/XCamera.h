@@ -3,5 +3,7 @@
 class XCamera :
 	public XComponent
 {
+public:
+	XCamera(XGameObject* gameObject);
 };
 
