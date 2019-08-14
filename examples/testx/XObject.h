@@ -2,7 +2,8 @@
 
 class XObject
 {
-public:
+	friend class XObjectMgr;
+protected:
 	virtual void OnStart();
 
 	virtual void OnUpdate();
