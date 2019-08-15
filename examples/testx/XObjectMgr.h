@@ -18,7 +18,19 @@ private:
 	*/
 	std::vector<XGameObject*>* pObjList = new std::vector<XGameObject*>();
 public:
-	template<typename T> T* AddObject();
+	template<typename T> T* AddObject() {
+		/*** 只有AddObject，不提供GetObject的操作，上层逻辑自己保存指针，这是比较现代的模式
+		* 为了提高遍历效率，可以考虑每AddObject一次排一次序
+		*/
+		XGameObject* obj = new T();
+		if (obj == NULL)
+			return NULL;
+
+		pObjList->push_back(obj);
+		obj->OnStart();
+
+		return (T*)obj;
+	}
 
 	void DestroyObject(XGameObject* pObj);
 
@@ -35,23 +47,5 @@ protected:
 
 extern XObjectMgr objMgr;
 
-#pragma region template implement
-
-/*** 只有AddObject，不提供GetObject的操作，上层逻辑自己保存指针，这是比较现代的模式
-* 为了提高遍历效率，可以考虑每AddObject一次排一次序
-*/
-template<typename T>
-inline T* XObjectMgr::AddObject()
-{
-	XGameObject* obj = new T();
-	if (obj == NULL)
-		return NULL;
-
-	pObjList->push_back(obj);
-	obj->OnStart();
-
-	return (T*)obj;
-}
-#pragma endregion
 
 
