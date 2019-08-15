@@ -4,9 +4,11 @@
 */
 #pragma once
 #include<vector>
+#include<string>
 
 #include "XObject.h"
 
+class XTransform;
 class XComponent;
 class XGameObject :
 	public XObject
@@ -14,7 +16,10 @@ class XGameObject :
 	friend class XObjectMgr;
 private:
 	std::vector<XComponent*>* objList = new std::vector<XComponent*>();
-
+	
+	XTransform* parent;
+	
+	std::string name;
 protected:
 	virtual void OnStart() override;
 
@@ -23,7 +28,9 @@ protected:
 	virtual void OnDestroy() override;
 
 public:
+	XGameObject(std::string name = "GameObject");
 
+	XGameObject(std::string name = "GameObject", XTransform* parent = NULL);
 public:
 	template<typename T> T* AddComponent() {
 		//显式赋值，用于检查T是不是XComponent的子类
@@ -73,4 +80,5 @@ public:
 
 	void RemoveAllComponents();
 
+	void SetParent(XTransform* parent);
 };

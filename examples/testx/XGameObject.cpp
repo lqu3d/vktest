@@ -48,3 +48,28 @@ void XGameObject::OnDestroy()
 	//step2
 	X_OBJ_RELEASE(objList);
 }
+
+/*** 参数使用std::string而不是char*或const char* 的原理
+* 一, 若使用char*,若外部使用的是string类型或const char*则无法转换，则外部只能：
+1，传字面字符串常量如XGameObject("myname")，这样每个名字都存储在常量区，物体销毁时字符串常量无法销毁，内存不可控。
+2，传一个指向堆上字符串的指针，这样我们自己还要把字符串拷贝一份保存到类内，不能直接保存指针，因为那会导致生命期不可控
+* 二，若使用const char*，导致名字永远不可改，限制了功能，不可取
+* 三，使用string，赋值时自动拷贝了参数的副本，以后也可以更改，外部可以传任意类型字符串（char*,const char*, string)，物体销毁时字符串也会销毁
+*/
+XGameObject::XGameObject(std::string name)
+{
+	this->name = name; //拷贝一个副本，与原来字符串脱离了关系
+	parent = NULL;
+}
+
+XGameObject::XGameObject(std::string name, XTransform* parent)
+{
+	this->name = name; //拷贝一个副本，与原来字符串脱离了关系
+	this->parent = parent;
+}
+
+void XGameObject::SetParent(XTransform* parent)
+{
+	this->parent = parent;
+}
+
