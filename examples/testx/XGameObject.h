@@ -17,75 +17,60 @@ private:
 
 protected:
 	virtual void OnStart() override;
+
 	virtual void OnUpdate() override;
+
 	virtual void OnDestroy() override;
 
 public:
 
 public:
-	template<typename T> T* AddComponent();
-	template<typename T> T* GetComponent();
-	template<typename T> void RemoveComponent();
-	template<typename T> void RemoveAllComponents();
+	template<typename T> T* AddComponent() {
+		//显式赋值，用于检查T是不是XComponent的子类
+		XComponent* go = new T(this);
+
+		objList->push_back(go);
+		return (T*)go;
+	}
+	
+	template<typename T> T* GetComponent() {
+		for (size_t i = 0; i < objList->size(); i++)
+		{
+			if (XSameType<T, decltype((*objList)[i])>())
+				return (*objList)[i];
+		}
+
+		return NULL;
+	}
+	
+	template<typename T> void RemoveComponent() {
+		for (auto iter = objList->begin(); iter != objList->end(); ++iter)
+		{
+			if (XSameType<T, decltype(*iter)>())
+			{
+				X_OBJ_RELEASE(*iter);
+				objList->erase(iter);
+				break;
+			}
+		}
+	}
+	
+	template<typename T> void RemoveAllComponents() {
+		std::vector<XGameObject*> vec;
+		for (auto iter = objList->begin(); iter != objList->end(); ++iter)
+		{
+			if (XSameType<T, decltype(*iter)>())
+			{
+				vec.push_back(*iter);
+			}
+		}
+
+		for (auto iter = vec.begin(); iter != vec.end(); ++iter) {
+			X_OBJ_RELEASE(*iter);
+			objList->erase(iter);
+		}
+	}
+
 	void RemoveAllComponents();
 
 };
-
-
-#pragma region 模板实现
-
-template<typename T>
-inline T* XGameObject::AddComponent()
-{
-	//显式赋值，用于检查T是不是XComponent的子类
-	XComponent* go = new T(this);
-
-	objList->push_back(go);
-	return (T*)go;
-}
-
-template<typename T>
-inline T* XGameObject::GetComponent()
-{
-	for (size_t i = 0; i < objList->size(); i++)
-	{
-		if (XSameType<T, decltype((*objList)[i])>())
-			return (*objList)[i];
-	}
-
-	return NULL;
-}
-
-template<typename T>
-inline void XGameObject::RemoveComponent()
-{
-	for(auto iter= objList->begin(); iter!=objList->end(); ++iter)
-	{
-		if (XSameType<T, decltype(*iter)>())
-		{
-			X_OBJ_RELEASE(*iter);
-			objList->erase(iter);
-			break;
-		}
-	}
-}
-
-template<typename T>
-inline void XGameObject::RemoveAllComponents()
-{
-	std::vector<XGameObject*> vec;
-	for (auto iter = objList->begin(); iter != objList->end(); ++iter)
-	{
-		if (XSameType<T, decltype(*iter)>())
-		{
-			vec.push_back(*iter);
-		}
-	}
-
-	for (auto iter = vec.begin(); iter != vec.end(); ++iter) {
-		X_OBJ_RELEASE(*iter);
-		objList->erase(iter);
-	}
-}
-
-#pragma endregion
