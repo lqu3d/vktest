@@ -27,9 +27,9 @@ protected:
 
 	virtual void OnDestroy() override;
 
-public:
-	XGameObject(std::string name = "GameObject");
+protected:
 
+	//只允许XObjectMgr构造，不允许外部私自调用，防止生成不受管制的GO
 	XGameObject(std::string name = "GameObject", XTransform* parent = NULL);
 public:
 	template<typename T> T* AddComponent() {

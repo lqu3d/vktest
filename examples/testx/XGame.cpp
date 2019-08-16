@@ -7,7 +7,7 @@
 
 void XGame::Start()
 {
-	auto go = new XGameObject();
+	XGameObject* go = objMgr.AddObject<XGameObject>();
 	XCamera* cam = go->AddComponent<XCamera>();
 	//cam->gameObject.
 
