@@ -2,5 +2,4 @@
 
 XTransform::XTransform(XGameObject* gameObject) : XComponent(gameObject)
 {
-
 }

@@ -1,6 +1,7 @@
 #include "XGameObject.h"
 #include "XComponent.h"
 #include "XUtils.h"
+#include "XTransform.h"
 
 void XGameObject::RemoveAllComponents()
 {
@@ -56,14 +57,10 @@ void XGameObject::OnDestroy()
 * 二，若使用const char*，导致名字永远不可改，限制了功能，不可取
 * 三，使用string，赋值时自动拷贝了参数的副本，以后也可以更改，外部可以传任意类型字符串（char*,const char*, string)，物体销毁时字符串也会销毁
 */
-XGameObject::XGameObject(std::string name, XTransform* parent)
+XGameObject::XGameObject(std::string name, XTransform* parent):transform(new XTransform(this))
 {
 	this->name = name; //拷贝一个副本，与原来字符串脱离了关系
-	this->parent = parent;
+	transform->parent = parent;
 }
 
-void XGameObject::SetParent(XTransform* parent)
-{
-	this->parent = parent;
-}
 

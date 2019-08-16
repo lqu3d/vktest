@@ -16,10 +16,7 @@ class XGameObject :
 	friend class XObjectMgr;
 private:
 	std::vector<XComponent*>* objList = new std::vector<XComponent*>();
-	
-	XTransform* parent;
-	
-	std::string name;
+
 protected:
 	virtual void OnStart() override;
 
@@ -27,10 +24,14 @@ protected:
 
 	virtual void OnDestroy() override;
 
-protected:
-
-	//只允许XObjectMgr构造，不允许外部私自调用，防止生成不受管制的GO
+private:
+	//只允许XObjectMgr构造，不允许继承，不允许外部私自调用-防止生成不受管制的GO
 	XGameObject(std::string name = "GameObject", XTransform* parent = NULL);
+
+public:
+	XTransform* const transform; //只在GameObject生成时生成
+	std::string name;
+
 public:
 	template<typename T> T* AddComponent() {
 		//显式赋值，用于检查T是不是XComponent的子类
@@ -80,5 +81,4 @@ public:
 
 	void RemoveAllComponents();
 
-	void SetParent(XTransform* parent);
 };
