@@ -23,10 +23,12 @@ void XGameMgr::Start()
 {
 	xvk.Setup();
 
-	xvk.BeginCmdBuffer();
-
 	objMgr.Start();
 	xgame.Start();
+
+	xvk.BeginCmdBuffer();
+
+
 	
 
 	xvk.EndCmdBuffer();

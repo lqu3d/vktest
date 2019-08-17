@@ -1,4 +1,5 @@
 #include "XTransform.h"
+#include <glm/ext.hpp>
 
 XTransform::XTransform(XGameObject* gameObject)
 	: gameObject(gameObject)
@@ -58,6 +59,16 @@ void XTransform::SetParent(XTransform* parent)
 XTransform* XTransform::GetParent()
 {
 	return nullptr;
+}
+
+void XTransform::LookAt(const vec3 & eye, const vec3 & center, const vec3& up)
+{
+	tmView = glm::lookAt(eye, center, up);
+}
+
+const glm::mat4* XTransform::GetMatrix()
+{
+	return &tmView;
 }
 
 

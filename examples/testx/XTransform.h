@@ -3,6 +3,7 @@
 #include <glm/glm.hpp>
 
 using glm::vec3;
+using glm::mat4;
 using std::vector;
 
 class XTransform
@@ -18,6 +19,7 @@ private:
 	vec3 localRotation;
 	vec3 localScale;
 
+	mat4 tmView;
 	XTransform* parent;
 	std::vector<XTransform*> childrens;
 
@@ -40,5 +42,8 @@ public:
 	void SetParent(XTransform* parent);
 	XTransform* GetParent();
 
+	void LookAt(const vec3 & eye, const vec3 & center, const vec3& up);
+
+	const glm::mat4* GetMatrix();
 };
 
