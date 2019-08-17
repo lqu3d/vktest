@@ -4,12 +4,18 @@
 
 #include "DrawCube.h"
 #include "XCamera.h"
+#include <glm/glm.hpp>
+#include "XTransform.h"
 
 void XGame::Start()
 {
 	XGameObject* go = objMgr.AddObject<XGameObject>();
 	XCamera* cam = go->AddComponent<XCamera>();
 	//cam->gameObject.
+	auto trans = cam->gameObject->transform;
+	auto pos = trans->GetPosition();
+	trans->SetPosition(glm::vec3(0, 1, 0));
+
 
 }
 

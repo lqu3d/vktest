@@ -7,8 +7,8 @@
 #include<string>
 
 #include "XObject.h"
+#include "XTransform.h"
 
-class XTransform;
 class XComponent;
 class XGameObject :
 	public XObject

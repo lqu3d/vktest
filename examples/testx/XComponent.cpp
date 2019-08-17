@@ -1,6 +1,7 @@
 #include "XComponent.h"
 
-XComponent::XComponent(XGameObject* gameObject):gameObject(gameObject)
+XComponent::XComponent(XGameObject* gameObject)
+	:gameObject(gameObject), transform(new XTransform(gameObject))
 {
 	
 }
