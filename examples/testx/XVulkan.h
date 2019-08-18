@@ -3,12 +3,11 @@
 //必须有这个宏，通知VULKAN包含WIN32平台的东西
 #define VK_USE_PLATFORM_WIN32_KHR
 
-#include <iostream>
 #include<vulkan/vulkan.h>	
 #include <vector>
-#include "XWindow.h"
+#include <glm/glm.hpp>
 
-#include "glm/glm.hpp"
+#include "XWindow.h"
 
 #pragma region struct
 struct XVkDepth {
@@ -21,15 +20,6 @@ struct XVkDepth {
 struct XVkBuffer {
 	VkDescriptorBufferInfo info;
 	VkDeviceMemory mem;
-};
-
-struct XVKCamera {
-	glm::vec3 pos; //相机位置
-	glm::vec3 lookAt; //看哪个点
-	glm::vec3 up; //相机的上方向向量
-
-	glm::mat4 tmView;
-	glm::mat4 tmProjection;
 };
 
 #pragma endregion
@@ -58,8 +48,6 @@ public:
 	std::vector<const char*> vkDevExtens;
 	std::vector<VkPhysicalDevice> gpus;
 
-
-	XVKCamera vkMainCamera;
 private:
 
 	void InitInstance();

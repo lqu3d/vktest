@@ -1,8 +1,12 @@
-#include "XCamera.h"
 #include <glm/ext.hpp>
+
+#include "XCamera.h"
+#include "XVulkan.h"
 
 XCamera::XCamera(XGameObject* gameObject):XComponent(gameObject)
 {
+	width = xvk.xWnd.width;
+	height = xvk.xWnd.height;
 }
 
 void XCamera::SetFov(float fov)
@@ -16,9 +20,9 @@ float XCamera::GetFov()
 	return fov;
 }
 
-void XCamera::SetNearPlane(float near)
+void XCamera::SetNearPlane(float fNear)
 {
-	this->fNear = near;
+	this->fNear = fNear;
 	tmProj = glm::perspective(fov, width * 1.0f / height, fNear, fFar);
 
 }
@@ -28,15 +32,15 @@ float XCamera::GetNearPlane()
 	return fNear;
 }
 
-void XCamera::SetFarPlane(float far)
+void XCamera::SetFarPlane(float fFar)
 {
-	this->fFar = far;
+	this->fFar = fFar;
 	tmProj = glm::perspective(fov, width * 1.0f / height, fNear, fFar);
 }
 
 float XCamera::GetFarPlane()
 {
-	return 0.0f;
+	return fFar;
 }
 
 const glm::mat4* XCamera::GetViewMatrix()
