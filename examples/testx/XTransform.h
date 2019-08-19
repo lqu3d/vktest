@@ -33,6 +33,7 @@ public:
 	XGameObject* const gameObject;
 	/***
 	* 使用函数式设置的目的，数据变化得到监视，数据变化时才重新计算整个父子层级
+	* 可能的缺点是：集中式GET会造成耗时波峰，可采用预先GET来解决
 	*/
 	void SetPosition(float x, float y, float z);
 	void SetPosition(const glm::vec3& pos);
