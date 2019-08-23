@@ -136,6 +136,7 @@ void XTransform::SetRotZ(float z)
 
 const vec3* XTransform::GetRot()
 {
+	//物体的平移旋转等价于从旧坐标系变换到新坐标系，这个变换过程就是视图变换，视图矩阵
 	if (rotChanged) {
 		RefreshHierachy();
 		rotChanged = false;
@@ -171,7 +172,9 @@ const glm::mat4* XTransform::GetMatrix()
 
 void XTransform::RefreshHierachy()
 {
-	tmProj = glm::translate(tmView, position);
+	if (posChanged) {
+		tmProj = glm::translate(tmView, position);
+	}
 
 	//update self
 	if (parent) {
