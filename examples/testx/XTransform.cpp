@@ -11,151 +11,13 @@ XTransform::XTransform(XGameObject* gameObject)
 
 }
 
-void XTransform::SetPos(float x, float y, float z)
-{
-	position.x = x;
-	position.y = y;
-	position.z = z;
-
-	posChanged = true;
-}
-
-void XTransform::SetPos(const glm::vec3& pos)
-{
-	position = pos;
-	posChanged = true;
-}
-
-void XTransform::SetX(float x)
-{
-	position.x = x;
-	posChanged = true;
-}
-
-void XTransform::SetY(float y)
-{
-	position.y = y;
-	posChanged = true;
-}
-
-void XTransform::SetZ(float z)
-{
-	position.z = z;
-	posChanged = true;
-}
-
-/***量子观察设计法
-* 只有当一个数据被观察时，才去更新它
-* 优点：可以整体上避免无用计算
-* 缺点：集中式GET会造成耗时波峰，可采用预先GET来解决
-*/
-const glm::vec3* XTransform::GetPosition()
-{
-	if (posChanged) {
-		RefreshHierachy();
-		posChanged = false;
-	}
-	return &position;
-}
-
-void XTransform::SetScale(float x, float y, float z)
-{
-	scale.x = x;
-	scale.y = y;
-	scale.z = z;
-	scaleChanged = true;
-}
-
-void XTransform::SetScale(const vec3& scale)
-{
-	this->scale = scale;
-	scaleChanged = true;
-}
-
-void XTransform::SetScaleX(float x)
-{
-	scale.x = x;
-	scaleChanged = true;
-
-}
-
-void XTransform::SetScaleY(float y)
-{
-	scale.y = y;
-	scaleChanged = true;
-
-}
-
-void XTransform::SetScaleZ(float z)
-{
-	scale.z = z;
-	scaleChanged = true;
-
-}
-
-const vec3* XTransform::GetScale()
-{
-	if (scaleChanged) {
-		RefreshHierachy();
-		scaleChanged = false;
-	}
-	return &scale;
-}
-
-void XTransform::SetRot(float x, float y, float z)
-{
-	rotation.x = x;
-	rotation.y = y;
-	rotation.z = z;
-	rotChanged = true;
-}
-
-void XTransform::SetRot(const vec3& rot)
-{
-	rotation = rot;
-	rotChanged = true;
-}
-
-void XTransform::SetRotX(float x)
-{
-	rotation.x = x;
-	rotChanged = true;
-}
-
-void XTransform::SetRotY(float y)
-{
-	rotation.y = y;
-	rotChanged = true;
-}
-
-void XTransform::SetRotZ(float z)
-{
-	rotation.z = z;
-	rotChanged = true;
-}
-
-const vec3* XTransform::GetRot()
-{
-	//物体的平移旋转等价于从旧坐标系变换到新坐标系，这个变换过程就是视图变换，视图矩阵
-	if (rotChanged) {
-		RefreshHierachy();
-		rotChanged = false;
-	}
-	return &rotation;
-}
-
 void XTransform::SetParent(XTransform* parent)
 {
 	this->parent = parent;
-	parentChanged = true;
 }
 
 XTransform* XTransform::GetParent()
 {
-	if (parentChanged) {
-		RefreshHierachy();
-		parentChanged = false;
-	}
 	return parent;
 }
 
@@ -169,21 +31,186 @@ const glm::mat4* XTransform::GetMatrix()
 	return &tmView;
 }
 
-
-void XTransform::RefreshHierachy()
+const mat4* XTransform::GetViewMatrix()
 {
-	if (posChanged) {
-		tmProj = glm::translate(tmView, position);
+	return nullptr;
+}
+
+void XTransform::SetPos(float x, float y, float z, eXSpace s)
+{
+	if (s == xsWorld) {
+		position.x = x;
+		position.y = y;
+		position.z = z;
 	}
-
-	//update self
-	if (parent) {
-
+	else {
+		localPosition.x = x;
+		localPosition.y = y;
+		localPosition.z = z;
 	}
+}
 
-	//update childrens
-	for each (auto var in childrens)
-	{
-
+void XTransform::SetPos(const vec3& pos, eXSpace s)
+{
+	if (s == xsWorld) {
+		position = pos;
 	}
+	else {
+		localPosition = position;
+	}
+}
+
+void XTransform::SetX(float x, eXSpace s)
+{
+	if (s == xsWorld) {
+		position.x = x;
+	}
+	else {
+		localPosition.x = x;
+	}
+}
+
+void XTransform::SetY(float y, eXSpace s)
+{
+	if (s == xsWorld) {
+		position.y = y;
+	}
+	else {
+		localPosition.y = y;
+	}
+}
+
+void XTransform::SetZ(float z, eXSpace s)
+{
+	if (s == xsWorld) {
+		position.z = z;
+	}
+	else {
+		localPosition.z = z;
+	}
+}
+
+const vec3* XTransform::GetPosition(eXSpace s)
+{
+	if (s == xsWorld)
+		return &position;
+	return &localPosition;
+}
+
+void XTransform::SetScale(float x, float y, float z, eXSpace s)
+{
+	if (s == xsWorld) {
+		scale.x = x;
+	}
+	else {
+		scale.x = x;
+	}
+}
+
+void XTransform::SetScale(const vec3& scale, eXSpace s)
+{
+	if (s == xsWorld) {
+		this->scale = scale;
+	}
+	else {
+		localScale = scale;
+	}
+}
+
+void XTransform::SetScaleX(float x, eXSpace s)
+{
+	if (s == xsWorld) {
+		scale.x = x;
+	}
+	else {
+		scale.x = x;
+	}
+}
+
+void XTransform::SetScaleY(float y, eXSpace s)
+{
+	if (s == xsWorld) {
+		scale.y = y;
+	}
+	else {
+		scale.y = y;
+	}
+}
+
+void XTransform::SetScaleZ(float z, eXSpace s)
+{
+	if (s == xsWorld) {
+		scale.z = z;
+	}
+	else {
+		scale.z = z;
+	}
+}
+
+const vec3* XTransform::GetScale(eXSpace s)
+{
+	if(s == xsWorld)
+		return &scale;
+	return &localScale;
+}
+
+void XTransform::SetRot(float x, float y, float z, eXSpace s)
+{
+	if (s == xsWorld) {
+		rotation.x = x;
+		rotation.y = y;
+		rotation.z = z;
+	}
+	else {
+		localRot.x = x;
+		localRot.y = y;
+		localRot.z = z;
+	}
+}
+
+void XTransform::SetRot(const vec3& rot, eXSpace s)
+{
+	if (s == xsWorld) {
+		rotation = rot;
+	}
+	else {
+		localRot = rot;
+	}
+}
+
+void XTransform::SetRotX(float x, eXSpace s)
+{
+	if (s == xsWorld) {
+		rotation.x = x;
+	}
+	else {
+		localRot.x = x;
+	}
+}
+
+void XTransform::SetRotY(float y, eXSpace s)
+{
+	if (s == xsWorld) {
+		rotation.y = y;
+	}
+	else {
+		localRot.y = y;
+	}
+}
+
+void XTransform::SetRotZ(float z, eXSpace s)
+{
+	if (s == xsWorld) {
+		rotation.z = z;
+	}
+	else {
+		localRot.z = z;
+	}
+}
+
+const vec3* XTransform::GetRot(eXSpace s)
+{
+	if(s == xsWorld)
+		return &rotation;
+	return &localRot;
 }
