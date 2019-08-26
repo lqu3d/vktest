@@ -36,58 +36,48 @@ const mat4* XTransform::GetViewMatrix()
 	return nullptr;
 }
 
-void XTransform::SetPos(float x, float y, float z, eXSpace s)
+void XTransform::SetPosChanel(int i, float v, eXSpace s)
 {
 	if (s == xsWorld) {
-		position.x = x;
-		position.y = y;
-		position.z = z;
+		position[i] = v;
+		localPosition[i] = v - parent->position[i];
 	}
 	else {
-		localPosition.x = x;
-		localPosition.y = y;
-		localPosition.z = z;
+		localPosition[i] = v;
+		position[i] = parent->position[i] + v;
 	}
+
+	//更新综合矩阵
+	tmCombined[3][i] = position[i];
+}
+
+void XTransform::SetPos(float x, float y, float z, eXSpace s)
+{
+	SetPosChanel(0, x, s);
+	SetPosChanel(1, y, s);
+	SetPosChanel(2, z, s);
 }
 
 void XTransform::SetPos(const vec3& pos, eXSpace s)
 {
-	if (s == xsWorld) {
-		position = pos;
-	}
-	else {
-		localPosition = position;
-	}
+	SetPosChanel(0, pos.x, s);
+	SetPosChanel(1, pos.y, s);
+	SetPosChanel(2, pos.z, s);
 }
 
 void XTransform::SetX(float x, eXSpace s)
 {
-	if (s == xsWorld) {
-		position.x = x;
-	}
-	else {
-		localPosition.x = x;
-	}
+	SetPosChanel(0, x, s);
 }
 
 void XTransform::SetY(float y, eXSpace s)
 {
-	if (s == xsWorld) {
-		position.y = y;
-	}
-	else {
-		localPosition.y = y;
-	}
+	SetPosChanel(1, y, s);
 }
 
 void XTransform::SetZ(float z, eXSpace s)
 {
-	if (s == xsWorld) {
-		position.z = z;
-	}
-	else {
-		localPosition.z = z;
-	}
+	SetPosChanel(2, z, s);
 }
 
 const vec3* XTransform::GetPosition(eXSpace s)
@@ -97,55 +87,49 @@ const vec3* XTransform::GetPosition(eXSpace s)
 	return &localPosition;
 }
 
-void XTransform::SetScale(float x, float y, float z, eXSpace s)
+void XTransform::SetScaleChanel(int i, float v, eXSpace s)
 {
 	if (s == xsWorld) {
-		scale.x = x;
+		scale[i] = v;
+		localScale[i] = v / parent->scale[i]; //todo: 除0检测
 	}
 	else {
-		scale.x = x;
+		localScale[i] = v;
+		scale[i] = parent->scale[i] * v;
 	}
+	lastScale[i] = scale[i];
+	
+	//更新综合矩阵
+	tmCombined[i][i] *= v / lastScale[i];
+}
+
+void XTransform::SetScale(float x, float y, float z, eXSpace s)
+{
+	SetScaleChanel(0, x, s);
+	SetScaleChanel(1, y, s);
+	SetScaleChanel(2, z, s);
 }
 
 void XTransform::SetScale(const vec3& scale, eXSpace s)
 {
-	if (s == xsWorld) {
-		this->scale = scale;
-	}
-	else {
-		localScale = scale;
-	}
+	SetScale(scale.x, scale.y, scale.z, s);
 }
 
 void XTransform::SetScaleX(float x, eXSpace s)
 {
-	if (s == xsWorld) {
-		scale.x = x;
-	}
-	else {
-		scale.x = x;
-	}
+	SetScaleChanel(0, x, s);
 }
 
 void XTransform::SetScaleY(float y, eXSpace s)
 {
-	if (s == xsWorld) {
-		scale.y = y;
-	}
-	else {
-		scale.y = y;
-	}
+	SetScaleChanel(1, y, s);
 }
 
 void XTransform::SetScaleZ(float z, eXSpace s)
 {
-	if (s == xsWorld) {
-		scale.z = z;
-	}
-	else {
-		scale.z = z;
-	}
+	SetScaleChanel(2, z, s);
 }
+
 
 const vec3* XTransform::GetScale(eXSpace s)
 {
@@ -154,63 +138,82 @@ const vec3* XTransform::GetScale(eXSpace s)
 	return &localScale;
 }
 
-void XTransform::SetRot(float x, float y, float z, eXSpace s)
+void XTransform::SetRotChanel(int i, float v, eXSpace s)
 {
 	if (s == xsWorld) {
-		rotation.x = x;
-		rotation.y = y;
-		rotation.z = z;
+		rotation[i] = v;
+
+		//todo: local rot
+
 	}
 	else {
-		localRot.x = x;
-		localRot.y = y;
-		localRot.z = z;
+		localPosition[i] = v;
+		//todo: rotation
+
 	}
+
+	//更新综合矩阵
+
+}
+
+void XTransform::SetRot(float x, float y, float z, eXSpace s)
+{
+	SetRotChanel(0, x, s);
+	SetRotChanel(1, y, s);
+	SetRotChanel(2, z, s);
 }
 
 void XTransform::SetRot(const vec3& rot, eXSpace s)
 {
-	if (s == xsWorld) {
-		rotation = rot;
-	}
-	else {
-		localRot = rot;
-	}
+	SetRotChanel(0, rot.x, s);
+	SetRotChanel(1, rot.y, s);
+	SetRotChanel(2, rot.z, s);
 }
 
 void XTransform::SetRotX(float x, eXSpace s)
 {
-	if (s == xsWorld) {
-		rotation.x = x;
-	}
-	else {
-		localRot.x = x;
-	}
+	SetRotChanel(0, x, s);
 }
 
 void XTransform::SetRotY(float y, eXSpace s)
 {
-	if (s == xsWorld) {
-		rotation.y = y;
-	}
-	else {
-		localRot.y = y;
-	}
+	SetRotChanel(1, y, s);
 }
 
 void XTransform::SetRotZ(float z, eXSpace s)
 {
-	if (s == xsWorld) {
-		rotation.z = z;
-	}
-	else {
-		localRot.z = z;
-	}
+	SetRotChanel(2, z, s);
 }
+
 
 const vec3* XTransform::GetRot(eXSpace s)
 {
 	if(s == xsWorld)
 		return &rotation;
 	return &localRot;
+}
+
+void XTransform::Translate(float x, float y, float z, eXSpace s)
+{
+	if (s == xsWorld) {
+		position.x += x;
+		position.y += y;
+		position.z += z;
+		localPosition = position - parent->position;
+	}
+	else {
+		localPosition.x += x;
+		localPosition.y += y;
+		localPosition.z += z;
+		position = parent->position + localPosition;
+	}
+
+	tmCombined[3].x = position.x;
+	tmCombined[3].y = position.y;
+	tmCombined[3].z = position.z;
+}
+
+void XTransform::Rotate(float x, float y, float z, eXSpace s)
+{
+
 }
