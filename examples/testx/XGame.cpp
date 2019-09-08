@@ -66,7 +66,7 @@ void XGame::Start()
 	*/
 
 	//translate运算是将1，2，3 添加到矩阵的第四行，结果为value[3] = 1,2,3,1
-	auto m3 = glm::translate(vec3(1, 2, 3));
+	//auto m3 = glm::translate(vec3(1, 2, 3));
 }
 
 void XGame::Update()

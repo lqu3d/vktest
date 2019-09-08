@@ -1,5 +1,5 @@
 #include "XTransform.h"
-#include <glm/ext.hpp>
+#include "XGameObject.h"
 
 XTransform::XTransform(XGameObject* gameObject)
 	: gameObject(gameObject)
@@ -23,7 +23,7 @@ XTransform* XTransform::GetParent()
 
 void XTransform::LookAt(const vec3 & eye, const vec3 & center, const vec3& up)
 {
-	tmView = glm::lookAt(eye, center, up);
+	//tmView = glm::lookAt(eye, center, up);
 }
 
 const glm::mat4* XTransform::GetMatrix()
@@ -40,7 +40,9 @@ void XTransform::SetPosChanel(int i, float v, eXSpace s)
 {
 	if (s == xsWorld) {
 		position[i] = v;
-		localPosition[i] = v - parent->position[i];
+		if (parent) {
+			localPosition[i] = v - parent->position[i];
+		}
 	}
 	else {
 		localPosition[i] = v;
@@ -91,11 +93,15 @@ void XTransform::SetScaleChanel(int i, float v, eXSpace s)
 {
 	if (s == xsWorld) {
 		scale[i] = v;
-		localScale[i] = v / parent->scale[i]; //todo: ³ý0¼ì²â
+		if (parent) {
+			localScale[i] = v / parent->scale[i]; //todo: ³ý0¼ì²â
+		}
 	}
 	else {
 		localScale[i] = v;
-		scale[i] = parent->scale[i] * v;
+		if (parent) {
+			scale[i] = parent->scale[i] * v;
+		}
 	}
 	lastScale[i] = scale[i];
 	

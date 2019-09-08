@@ -37,7 +37,7 @@ private:
 	mat4 tmView;
 	mat4 tmCombined; //平移旋转缩放综合矩阵: 
 
-	XTransform* parent;
+	XTransform* parent = NULL;
 	std::vector<XTransform*> childrens;
 
 private:
