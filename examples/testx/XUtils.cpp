@@ -19,11 +19,11 @@ void XUtils::XPrint(glm::mat4 m, const char* pInfo)
 void XUtils::XPrint(glm::vec3 v, const char* pInfo)
 {
 	printf("向量%s\n", pInfo != NULL ? pInfo : "");
-	printf("%-15.2f%-15.2f%-15.2f\n", v.x, v.y, v.z);
+	printf("%-15.2f%-15.2f%-15.2f\n\n", v.x, v.y, v.z);
 }
 
 void XUtils::XPrint(glm::vec4 v, const char* pInfo)
 {
 	printf("向量%s\n", pInfo != NULL ? pInfo : "");
-	printf("%-15.2f%-15.2f%-15.2f%-15.2f\n", v.x, v.y, v.z, v.w);
+	printf("%-15.2f%-15.2f%-15.2f%-15.2f\n\n", v.x, v.y, v.z, v.w);
 }
