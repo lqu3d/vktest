@@ -57,6 +57,9 @@
     <ClCompile Include="XCamera.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="GLMTest.cpp">
+      <Filter>头文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="XGameMgr.h">
@@ -96,6 +99,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="XCamera.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="GLMTest.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
