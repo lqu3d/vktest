@@ -5,6 +5,7 @@ void XUtils::XLogToFile()
 {
 }
 
+//格式化输出矩阵，15位宽，2位小数，左对齐
 void XUtils::XPrint(glm::mat4 m, const char* pInfo)
 {
 	printf("矩阵%s\n", pInfo!=NULL ? pInfo : "" );
