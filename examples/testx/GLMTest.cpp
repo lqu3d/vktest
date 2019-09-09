@@ -6,13 +6,10 @@ using namespace XUtils;
 void GLMTest::Test()
 {
 	TestBase();
+	TestTranslate();
+	TestRotate();
+	TestScale();
 
-	glm::mat4 mat(1.0f);
-	glm::vec3 v1(1.0f);
-
-	
-
-	
 }
 
 void GLMTest::TestBase()
@@ -62,7 +59,7 @@ void GLMTest::TestBase()
 	auto vt = mat * v; //结果是(14,21,23,26)
 	XPrint(vt);
 
-
+	XPrint(m2,"m2");
 	/***
 	*【总结】
 	* 1， glm中矩阵的存储是按行存储的，与DX一致
@@ -74,4 +71,77 @@ void GLMTest::TestBase()
 				 (0,0,1,0)
 				 (1,1,1,1)
 	*/
+}
+
+//====================================================================
+//平移
+//====================================================================
+void GLMTest::TestTranslate()
+{
+	glm::mat4 mat(1.0f); //单位矩阵mat[0][0]=mat[1][1]=mat[2][2]=1，其余全0
+	glm::vec3 v1(1.0f);  //(1,1,1)
+	glm::vec3 v2(1, 2, 3);
+
+	XPrint(mat, "mat");
+	XPrint(v1, "v1");
+	XPrint(v2, "v2");
+
+	//注意，两次translate是叠加的
+	mat = glm::translate(mat, v1);
+	XPrint(mat, "mat");//mat[3] = (1,1,1,1)
+
+	mat = glm::translate(mat, v2);
+	XPrint(mat, "mat");//mat[3] = (1,1,1,1) + (1,2,3,0) = (2,3,4,1)
+}
+
+//====================================================================
+//旋转
+//====================================================================
+void GLMTest::TestRotate()
+{
+	glm::mat4 mat(1.0f);
+	glm::vec4 v1(1,0,0,1);
+
+	mat = glm::rotate(mat, glm::radians(60.0f), glm::vec3(0, 0, 1));
+	XPrint(mat, "旋转60度");
+
+	//glm中使用GL的右手坐标系，X向右，Y向上，Z向屏幕外
+	//右手坐标系下旋转规则：右手握住旋转轴-大拇指指向旋转轴正方向，其余四指的指向便是旋转正向
+
+	//0.5	0.87		0	0
+	//-0,87	0.5		0	0
+	//0		0		1	0
+	//0		0		0	1
+
+	//对应矩阵公式如下
+	//cosa	sina		0	0
+	//-sina	cosa		0	0
+	//0		0		1	0
+	//0		0		0	1
+
+	v1 = mat * v1; //0.5, 0.87, 0, 1
+
+	XPrint(v1);
+
+	//矩阵形式也有：先后旋转a,b角度等于一次旋转(a+b)角度
+	/*	|cosa	sina|  *  |cosb		sinb| =	|cos(a+b)	sin(a+b)|
+		|-sina	cosa|	 |-sinb		cosb|    |-sin(a+b)	cos(a+b)|
+	*/
+	
+	//再旋转30度，一共旋转了90度
+	mat = glm::rotate(mat, glm::radians(30.0f), glm::vec3(0, 0, 1));
+	XPrint(mat, "旋转90度");
+}
+
+void GLMTest::TestScale()
+{
+	glm::mat4 mat(1.0f);
+	glm::vec3 v(1, 2, 3);
+	glm::vec3 v2(2, 2, 2);
+
+	mat = glm::scale(mat, v);
+	XPrint(mat, "scale");
+
+	mat = glm::scale(mat, v2);
+	XPrint(mat, "scale2");
 }

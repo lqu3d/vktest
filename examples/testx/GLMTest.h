@@ -6,5 +6,8 @@ public:
 
 private:
 	void TestBase();
+	void TestTranslate();
+	void TestRotate();
+	void TestScale();
 };
 
