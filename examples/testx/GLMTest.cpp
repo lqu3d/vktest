@@ -87,12 +87,8 @@ void GLMTest::TestTranslate()
 	XPrint(v2, "v2");
 
 	/*********************************************************************************
-	*	【注意】
-	*	生成一个单位矩阵M，将v1放到第四行，然后mat = mat*M，并不是直接将v1放到mat的第四行
-	*	源码中的实现比这个要高效，但原理就是如此
-	*	这个操作实际上是两个操作的合成：1，平移，2，乘上一个矩阵mat
+	*	【注意】1，平移，2，乘以mat
 	*	对于连续平移，这个操作比较低效，高效的作法是每次平移只改变矩阵第四行的x,y,z
-	*	具体见TestCombined
 	**********************************************************************************/
 
 	mat = glm::translate(mat, v1);
@@ -110,6 +106,7 @@ void GLMTest::TestRotate()
 	glm::mat4 mat(1.0f);
 	glm::vec4 v1(1,0,0,1);
 
+	//【注意】1，旋转，2，乘以mat
 	mat = glm::rotate(mat, glm::radians(60.0f), glm::vec3(0, 0, 1));
 	XPrint(mat, "旋转60度");
 
@@ -147,6 +144,7 @@ void GLMTest::TestScale()
 	glm::vec3 v(1, 2, 3);
 	glm::vec3 v2(2, 2, 2);
 
+	//【注意】1，缩放，2，乘以mat
 	mat = glm::scale(mat, v);
 	XPrint(mat, "scale");
 
