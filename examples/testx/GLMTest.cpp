@@ -5,11 +5,11 @@ using namespace XUtils;
 
 void GLMTest::Test()
 {
-	TestBase();
-	TestTranslate();
-	TestRotate();
-	TestScale();
-
+	//TestBase();
+	//TestTranslate();
+	//TestRotate();
+	//TestScale();
+	TestCombined();
 }
 
 void GLMTest::TestBase()
@@ -86,7 +86,15 @@ void GLMTest::TestTranslate()
 	XPrint(v1, "v1");
 	XPrint(v2, "v2");
 
-	//注意，两次translate是叠加的
+	/*********************************************************************************
+	*	【注意】
+	*	生成一个单位矩阵M，将v1放到第四行，然后mat = mat*M，并不是直接将v1放到mat的第四行
+	*	源码中的实现比这个要高效，但原理就是如此
+	*	这个操作实际上是两个操作的合成：1，平移，2，乘上一个矩阵mat
+	*	对于连续平移，这个操作比较低效，高效的作法是每次平移只改变矩阵第四行的x,y,z
+	*	具体见TestCombined
+	**********************************************************************************/
+
 	mat = glm::translate(mat, v1);
 	XPrint(mat, "mat");//mat[3] = (1,1,1,1)
 
@@ -144,4 +152,26 @@ void GLMTest::TestScale()
 
 	mat = glm::scale(mat, v2);
 	XPrint(mat, "scale2");
+}
+
+void GLMTest::TestCombined()
+{
+	glm::mat4 mat(1.0f);
+	glm::vec4 v1(1, 0, 0, 1);
+
+	glm::vec4 pt(1, 0, 0, 1);
+	mat = glm::rotate(mat, glm::radians(60.0f), glm::vec3(0, 0, 1));
+	XPrint(mat, "旋转60度");
+
+	//=================================================================
+	//【注意】先平移(1,2,3)，再旋转60度
+	//=================================================================
+	mat = glm::translate(mat, glm::vec3(1, 2, 3));
+
+	pt = mat * pt;
+	XPrint(pt, "pt");
+
+	//=================================================================
+	//【可以证明】平移只改变矩阵的最后一行 ，不管这个矩阵有无旋转，缩放 
+	//=================================================================
 }

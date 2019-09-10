@@ -9,5 +9,7 @@ private:
 	void TestTranslate();
 	void TestRotate();
 	void TestScale();
+
+	void TestCombined();
 };
 

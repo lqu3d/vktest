@@ -205,18 +205,25 @@ void XTransform::Translate(float x, float y, float z, eXSpace s)
 		position.x += x;
 		position.y += y;
 		position.z += z;
-		localPosition = position - parent->position;
+		if (parent) {
+			localPosition = position - parent->position;
+		}
 	}
 	else {
 		localPosition.x += x;
 		localPosition.y += y;
 		localPosition.z += z;
-		position = parent->position + localPosition;
+		if (parent) {
+			position = parent->position + localPosition;
+		}
 	}
 
-	tmCombined[3].x = position.x;
-	tmCombined[3].y = position.y;
-	tmCombined[3].z = position.z;
+	//=================================================================
+	//【可以证明】平移只改变矩阵的最后一行 ，不管这个矩阵有无旋转，缩放 
+	//=================================================================
+	tmCombined[3].x += position.x;
+	tmCombined[3].y += position.y;
+	tmCombined[3].z += position.z;
 }
 
 void XTransform::Rotate(float x, float y, float z, eXSpace s)
