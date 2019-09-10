@@ -4,14 +4,15 @@ class XCamera :
 	public XComponent
 {
 private:
-	glm::mat4 tmProj;
+	glm::mat4 __tmProj; //¡¾Âã±äÁ¿¡¿
+	bool isProjChged = false;
+
 	float fNear = 1;
 	float fFar = 1000;
 	float fov = 45;
 	float width = 100	;
 	float height = 100;
 
-	bool isProjChged = false;
 public:
 	XCamera(XGameObject* gameObject);
 

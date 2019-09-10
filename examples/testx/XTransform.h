@@ -34,9 +34,12 @@ private:
 	vec3 right;
 	vec3 forward;
 
+	/***
+	*【裸变量】形如 __x的变量是裸变量，不允许直接使用，应通过get函数获取
+	*/
 	mat4 tmView;
 	mat4 tmCombined; //平移旋转缩放综合矩阵: 
-	mat4 tmCombinedLocal; //局部变换，相对于父坐标
+	mat4 __tmCombinedLocal; //【裸变量】局部变换，相对于父坐标，
 
 	bool isTmCombinedChged = false;//一旦综合tmCombined变了，tmCombinedLocal就要重新计算
 	XTransform* parent = NULL;

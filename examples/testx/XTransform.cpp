@@ -173,7 +173,7 @@ void XTransform::SetRotChanel(int i, float v, eXSpace s)
 	auto sn = sinf(rad);
 
 	auto& zoom = s == xsWorld ? scale : localScale;
-	auto& tm = s == xsWorld ? tmCombined : tmCombinedLocal;
+	auto& tm = s == xsWorld ? tmCombined : __tmCombinedLocal;
 	
 	if (i == 2) {//z-x,y
 		tm[0][0] = cn * zoom.x;		tm[0][1] = sn;
@@ -189,7 +189,7 @@ void XTransform::SetRotChanel(int i, float v, eXSpace s)
 	}
 
 	if (s == xsLocal) {
-		tmCombined = tmCombined * tmCombinedLocal;
+		tmCombined = tmCombined * __tmCombinedLocal;
 	}
 }
 
@@ -289,8 +289,8 @@ mat4* XTransform::GetTmCombinedLocal()
 		// parent.tmCombined * tmCombinedLocal = tmCombined
 		// tmCombinedLocal = reverse(parent.tmcombined) * tmCombined 
 
-		tmCombinedLocal = glm::inverse(parent->tmCombined) * tmCombined;
+		__tmCombinedLocal = glm::inverse(parent->tmCombined) * tmCombined;
 		isTmCombinedChged = false;
 	}
-	return &tmCombinedLocal;
+	return &__tmCombinedLocal;
 }

@@ -7,7 +7,7 @@ XCamera::XCamera(XGameObject* gameObject):XComponent(gameObject)
 {
 	width = xvk.xWnd.width;
 	height = xvk.xWnd.height;
-	tmProj = mat4(1);
+	__tmProj = mat4(1);
 }
 
 void XCamera::SetFov(float fov)
@@ -51,9 +51,9 @@ const glm::mat4* XCamera::GetViewMatrix()
 const glm::mat4* XCamera::GetProjectionMatrix()
 {
 	if (isProjChged) {//量子观察设计法，只有用到数据时才去计算它
-		tmProj = glm::perspective(fov, width * 1.0f / height, fNear, fFar);
+		__tmProj = glm::perspective(fov, width * 1.0f / height, fNear, fFar);
 		isProjChged = false;
 	}
 
-	return &tmProj;
+	return &__tmProj;
 }
