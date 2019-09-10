@@ -16,9 +16,13 @@ void XGame::Start()
 	auto trans = cam->gameObject->transform;
 	auto pos = trans->GetPosition();
 	trans->SetPos(glm::vec3(0, 1, 0));
+	cam->SetNearPlane(1.0f);
+	cam->SetFarPlane(1000.0f);
+	cam->SetFov(45);
+	//GLMTest glmtest;
+	//glmtest.Test();
 
-	GLMTest glmtest;
-	glmtest.Test();
+
 
 }
 
@@ -28,13 +32,4 @@ void XGame::Update()
 
 void XGame::OnDestroy()
 {
-}
-
-void XGame::SetupCamera()
-{
-	//float fov = glm::radians(45.0f);
-	//float wdh = xvk.xWnd.width * 1.0f / xvk.xWnd.height;
-	//float hdw = xvk.xWnd.height * 1.0f / xvk.xWnd.width;
-	//fov *= wdh;
-
 }

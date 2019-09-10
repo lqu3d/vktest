@@ -10,6 +10,8 @@ private:
 	float fov = 45;
 	float width = 100	;
 	float height = 100;
+
+	bool isProjChged = false;
 public:
 	XCamera(XGameObject* gameObject);
 

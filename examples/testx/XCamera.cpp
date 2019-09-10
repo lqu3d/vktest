@@ -7,12 +7,13 @@ XCamera::XCamera(XGameObject* gameObject):XComponent(gameObject)
 {
 	width = xvk.xWnd.width;
 	height = xvk.xWnd.height;
+	tmProj = mat4(1);
 }
 
 void XCamera::SetFov(float fov)
 {
 	this->fov = fov;
-	tmProj = glm::perspective(fov, width*1.0f/height, fNear, fFar);
+	isProjChged = true;
 }
 
 float XCamera::GetFov()
@@ -23,8 +24,7 @@ float XCamera::GetFov()
 void XCamera::SetNearPlane(float fNear)
 {
 	this->fNear = fNear;
-	tmProj = glm::perspective(fov, width * 1.0f / height, fNear, fFar);
-
+	isProjChged = true;
 }
 
 float XCamera::GetNearPlane()
@@ -35,7 +35,7 @@ float XCamera::GetNearPlane()
 void XCamera::SetFarPlane(float fFar)
 {
 	this->fFar = fFar;
-	tmProj = glm::perspective(fov, width * 1.0f / height, fNear, fFar);
+	isProjChged = true;
 }
 
 float XCamera::GetFarPlane()
@@ -50,5 +50,10 @@ const glm::mat4* XCamera::GetViewMatrix()
 
 const glm::mat4* XCamera::GetProjectionMatrix()
 {
+	if (isProjChged) {//量子观察设计法，只有用到数据时才去计算它
+		tmProj = glm::perspective(fov, width * 1.0f / height, fNear, fFar);
+		isProjChged = false;
+	}
+
 	return &tmProj;
 }

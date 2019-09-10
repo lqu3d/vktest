@@ -9,8 +9,6 @@ protected:
 	void Update();
 
 	void OnDestroy();
-
-	void SetupCamera();
 };
 
 
