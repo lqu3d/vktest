@@ -1,6 +1,16 @@
 #include <iostream>
 #include "XUtils.h"
 
+bool XUtils::XIsZero(float fx)
+{
+	return fx > -XEps && fx < XEps;
+}
+
+bool XUtils::XIsZero(double fx)
+{
+	return fx > -XEps && fx < XEps;
+}
+
 void XUtils::XLogToFile()
 {
 }

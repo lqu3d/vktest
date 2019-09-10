@@ -8,6 +8,12 @@
 
 namespace XUtils {
 
+	const float XEps = 0.000001f;
+
+	bool XIsZero(float fx);
+
+	bool XIsZero(double fx);
+
 	void XLogToFile();
 
 	void XPrint(glm::mat4 m, const char* pInfo = NULL);

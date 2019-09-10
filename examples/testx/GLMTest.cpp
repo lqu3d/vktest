@@ -133,7 +133,7 @@ void GLMTest::TestRotate()
 		|-sina	cosa|	 |-sinb		cosb|    |-sin(a+b)	cos(a+b)|
 	*/
 	
-	//再旋转30度，一共旋转了90度
+	//先旋转30度，再旋转60度(即乘以mat)，一共旋转了90度
 	mat = glm::rotate(mat, glm::radians(30.0f), glm::vec3(0, 0, 1));
 	XPrint(mat, "旋转90度");
 }

@@ -36,7 +36,9 @@ private:
 
 	mat4 tmView;
 	mat4 tmCombined; //平移旋转缩放综合矩阵: 
+	mat4 tmCombinedLocal; //局部变换，相对于父坐标
 
+	bool isTmCombinedChged = false;//一旦综合tmCombined变了，tmCombinedLocal就要重新计算
 	XTransform* parent = NULL;
 	std::vector<XTransform*> childrens;
 
@@ -44,7 +46,9 @@ private:
 	//只能由GameObject和XComponent构造，不允许继承，不允许外部私自生成
 	XTransform(XGameObject* gameObject);
 
+	mat4* GetTmCombinedLocal();
 public:
+	static vec3 Up, Right, Forward;
 
 	XGameObject* const gameObject;
 	/***

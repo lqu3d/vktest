@@ -1,15 +1,27 @@
 #include "XTransform.h"
 #include "XGameObject.h"
+#include "XUtils.h"
+
+vec3 XTransform::Up = vec3(0, 1, 0);
+vec3 XTransform::Right = vec3(1, 0, 0);
+vec3 XTransform::Forward = vec3(0, 0, 1);
 
 XTransform::XTransform(XGameObject* gameObject)
 	: gameObject(gameObject)
 	
 {
+	tmCombined = mat4(1.0f);
+
+	up = vec3(0, 1, 0);
+	right = vec3(1, 0, 0);
+	forward = vec3(0, 0, 1);
+
 	SetPos(0, 0, 0);
 	SetRot(0, 0, 0);
 	SetScale(1, 1, 1);
 
 }
+
 
 void XTransform::SetParent(XTransform* parent)
 {
@@ -46,11 +58,14 @@ void XTransform::SetPosChanel(int i, float v, eXSpace s)
 	}
 	else {
 		localPosition[i] = v;
-		position[i] = parent->position[i] + v;
+		if (parent) {
+			position[i] = parent->position[i] + v;
+		}
 	}
 
 	//更新综合矩阵
 	tmCombined[3][i] = position[i];
+	isTmCombinedChged = true;
 }
 
 void XTransform::SetPos(float x, float y, float z, eXSpace s)
@@ -91,22 +106,26 @@ const vec3* XTransform::GetPosition(eXSpace s)
 
 void XTransform::SetScaleChanel(int i, float v, eXSpace s)
 {
+	float oldScale = 1.0f;
 	if (s == xsWorld) {
+		oldScale = scale[i];
 		scale[i] = v;
 		if (parent) {
 			localScale[i] = v / parent->scale[i]; //todo: 除0检测
 		}
 	}
 	else {
+		oldScale = localScale[i];
 		localScale[i] = v;
 		if (parent) {
 			scale[i] = parent->scale[i] * v;
 		}
 	}
-	lastScale[i] = scale[i];
 	
 	//更新综合矩阵
-	tmCombined[i][i] *= v / lastScale[i];
+	tmCombined[i][i] *= v / oldScale;
+	isTmCombinedChged = true;
+
 }
 
 void XTransform::SetScale(float x, float y, float z, eXSpace s)
@@ -146,20 +165,32 @@ const vec3* XTransform::GetScale(eXSpace s)
 
 void XTransform::SetRotChanel(int i, float v, eXSpace s)
 {
-	if (s == xsWorld) {
-		rotation[i] = v;
+	//cos sin
+	//-sin cos
+	auto rad = glm::radians(v);
 
-		//todo: local rot
+	auto cn = cosf(rad);
+	auto sn = sinf(rad);
 
+	auto& zoom = s == xsWorld ? scale : localScale;
+	auto& tm = s == xsWorld ? tmCombined : tmCombinedLocal;
+	
+	if (i == 2) {//z-x,y
+		tm[0][0] = cn * zoom.x;		tm[0][1] = sn;
+		tm[1][0] = -sn;				tm[1][1] = cn * zoom.y;
 	}
-	else {
-		localPosition[i] = v;
-		//todo: rotation
-
+	else if (i == 0) {//x-y,z
+		tm[1][1] = cn * zoom.y;		tm[1][2] = sn;
+		tm[2][1] = -sn;				tm[2][2] = cn * zoom.z;
+	}
+	else if (i == 1) {//y-x,z
+		tm[0][0] = cn * zoom.x;		tm[0][2] = sn;
+		tm[2][0] = -sn;				tm[2][2] = cn * zoom.z;
 	}
 
-	//更新综合矩阵
-
+	if (s == xsLocal) {
+		tmCombined = tmCombined * tmCombinedLocal;
+	}
 }
 
 void XTransform::SetRot(float x, float y, float z, eXSpace s)
@@ -178,17 +209,16 @@ void XTransform::SetRot(const vec3& rot, eXSpace s)
 
 void XTransform::SetRotX(float x, eXSpace s)
 {
-	SetRotChanel(0, x, s);
+	
 }
 
 void XTransform::SetRotY(float y, eXSpace s)
 {
-	SetRotChanel(1, y, s);
+	
 }
 
 void XTransform::SetRotZ(float z, eXSpace s)
 {
-	SetRotChanel(2, z, s);
 }
 
 
@@ -224,9 +254,43 @@ void XTransform::Translate(float x, float y, float z, eXSpace s)
 	tmCombined[3].x += position.x;
 	tmCombined[3].y += position.y;
 	tmCombined[3].z += position.z;
+
+	isTmCombinedChged = true;
+
 }
 
 void XTransform::Rotate(float x, float y, float z, eXSpace s)
 {
+	vec3 vx, vy, vz;
+	if (s == xsWorld) { vx = Right; vy = Up; vz = Forward; }
+	else { vx = right; vy = up; vz = forward; }
 
+	if (!XUtils::XIsZero(x)) {
+		tmCombined = glm::rotate(tmCombined, glm::radians(x), vx);
+		isTmCombinedChged = true;
+	}
+	if (!XUtils::XIsZero(y)) {
+		tmCombined = glm::rotate(tmCombined, glm::radians(y), vy);
+		isTmCombinedChged = true;
+	}
+	if (!XUtils::XIsZero(z)) {
+		tmCombined = glm::rotate(tmCombined, glm::radians(z), vz);
+		isTmCombinedChged = true;
+	}
+}
+
+mat4* XTransform::GetTmCombinedLocal()
+{
+	if (!parent) {
+		return &tmCombined;
+	}
+
+	if (isTmCombinedChged) {
+		// parent.tmCombined * tmCombinedLocal = tmCombined
+		// tmCombinedLocal = reverse(parent.tmcombined) * tmCombined 
+
+		tmCombinedLocal = glm::inverse(parent->tmCombined) * tmCombined;
+		isTmCombinedChged = false;
+	}
+	return &tmCombinedLocal;
 }
