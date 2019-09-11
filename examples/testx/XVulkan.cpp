@@ -165,6 +165,7 @@ void XVulkan::Draw(XVkBuffer* pBuff)
 
 void XVulkan::EndRenderPass()
 {
+	vkCmdEndRenderPass(vkCmdBuffer);
 }
 
 void XVulkan::InitSwapChain()
@@ -414,6 +415,37 @@ void XVulkan::AcquireNextImage(VkSwapchainKHR swapChain, UINT* imgIdx)
 	res = vkAcquireNextImageKHR(vkDevice, vkSwapchain, UINT64_MAX, imgAccSemaphore, NULL, imgIdx);
 	CheckResult(res);
 
+}
+
+void XVulkan::InitPiplineLayout()
+{
+	VkDescriptorSetLayoutBinding binding[2] = {};
+	binding[0].binding = 0;
+	binding[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER; //uniform buffer
+	binding[0].stageFlags = VK_SHADER_STAGE_VERTEX_BIT; //vertext shader
+	binding[0].descriptorCount = 1; //vertext shader中的变量个数，现在我们只有一个mvp矩阵
+
+	binding[1].binding = 1;
+	binding[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER; //图片采样器
+	binding[1].stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT; //pixel shader
+	binding[1].descriptorCount = 1; //pixel shader中的变量个数，现在我们只有一个图片的sampler
+
+	VkDescriptorSetLayoutCreateInfo layinfo = {};
+	layinfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+	layinfo.bindingCount = 2;
+	layinfo.pBindings = binding;
+
+	VkDescriptorSetLayout layout;
+	VkResult res = vkCreateDescriptorSetLayout(vkDevice, &layinfo, NULL, &layout);
+	CheckResult(res);
+
+	VkPipelineLayoutCreateInfo pipinfo = {};
+	pipinfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+	pipinfo.setLayoutCount = 1;
+	pipinfo.pSetLayouts = &layout; //
+
+	res = vkCreatePipelineLayout(vkDevice, &pipinfo, NULL, &vkPipelineLayout);
+	CheckResult(res);
 }
 
 void XVulkan::SetViewPort(int x, int y, int width, int height)

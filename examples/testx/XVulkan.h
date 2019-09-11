@@ -48,6 +48,8 @@ public:
 	VkRect2D scissor;
 
 	VkRenderPass vkRenderPass; //Î´¸³Öµ
+	VkPipelineLayout vkPipelineLayout;
+
 	VkPipeline vkPipeline; 
 	
 	VkFramebuffer* pFrameBuffers = NULL;
@@ -75,6 +77,9 @@ private:
 	void InitSwapChain();
 	void InitDepthBuffer();
 
+	void InitPiplineLayout();
+
+
 	bool memory_type_from_properties(uint32_t typeBits, VkFlags requirements_mask, uint32_t* typeIndex);
 
 	void AcquireNextImage(VkSwapchainKHR swapChain, UINT* imgIdx);
@@ -94,11 +99,13 @@ public:
 	void ClearStencil(float f);
 	
 	void BeginCmdBuffer();
-	void EndCmdBuffer();
 
 	void BeginRenderPass();
 	void Draw(XVkBuffer* pBuff);
 	void EndRenderPass();
+
+	void EndCmdBuffer();
+
 
 	bool ShouldClose();
 	void CheckResult(VkResult err);
