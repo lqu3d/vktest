@@ -127,6 +127,46 @@ void XVulkan::EndCmdBuffer()
 	CheckResult(ret);
 }
 
+void XVulkan::BeginRenderPass()
+{
+	UINT imgIdx = 0;
+	AcquireNextImage(vkSwapchain, &imgIdx);
+	if (!pFrameBuffers) {
+		printf("pFrameBuffers == NULL");
+		return;
+	}
+
+	VkRenderPassBeginInfo info = {};
+	info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+	info.renderPass = vkRenderPass;
+	info.framebuffer = pFrameBuffers[imgIdx];
+	
+	info.renderArea.extent.width = viewport.width;
+	info.renderArea.extent.height = viewport.height;
+	info.renderArea.offset.x = 0;
+	info.renderArea.offset.y = 0;
+
+	info.clearValueCount = 1;  // == 2 ????
+	info.pClearValues = &clearValue;
+
+	vkCmdBeginRenderPass(vkCmdBuffer, &info, VK_SUBPASS_CONTENTS_INLINE);
+	vkCmdBindPipeline(vkCmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, vkPipeline);
+
+	//todo:
+	//vkCmdBindDescriptorSets(vkCmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, layout, 0, 1, sets, 0, NULL);
+
+}
+
+void XVulkan::Draw(XVkBuffer* pBuff)
+{
+	vkCmdBindVertexBuffers(vkCmdBuffer, 0, 1, &(pBuff->info.buffer), &(pBuff->info.offset));
+	vkCmdDrawIndexed(vkCmdBuffer, pBuff->idxCnt, 1, 0, 0, 0);
+}
+
+void XVulkan::EndRenderPass()
+{
+}
+
 void XVulkan::InitSwapChain()
 {
 	VkSurfaceCapabilitiesKHR scaps;
@@ -360,6 +400,65 @@ void XVulkan::WriteBuffer(XVkBuffer xvkBuffer, void* pdata, UINT size, UINT offs
 
 	vkUnmapMemory(vkDevice, xvkBuffer.mem);
 
+}
+
+void XVulkan::AcquireNextImage(VkSwapchainKHR swapChain, UINT* imgIdx)
+{
+	VkSemaphore imgAccSemaphore;
+	VkSemaphoreCreateInfo info = {};
+	info.flags = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+	
+	auto res = vkCreateSemaphore(vkDevice, &info, NULL, &imgAccSemaphore);
+	CheckResult(res);
+
+	res = vkAcquireNextImageKHR(vkDevice, vkSwapchain, UINT64_MAX, imgAccSemaphore, NULL, imgIdx);
+	CheckResult(res);
+
+}
+
+void XVulkan::SetViewPort(int x, int y, int width, int height)
+{
+	viewport.x = x;
+	viewport.y = y;
+	viewport.width = width;
+	viewport.height = height;
+
+	scissor.extent.width = width;
+	scissor.extent.height = height;
+	scissor.offset.x = 0;
+	scissor.offset.y = 0;
+
+	vkCmdSetViewport(vkCmdBuffer, 0, 1, &viewport);
+	vkCmdSetScissor(vkCmdBuffer, 0, 1, &scissor);
+
+}
+
+void XVulkan::ClearColorDepthStencil(float r, float g, float b, float a, float depth, float s)
+{
+	clearValue.color.float32[0] = r;
+	clearValue.color.float32[1] = g;
+	clearValue.color.float32[2] = b;
+	clearValue.color.float32[3] = a;
+	clearValue.depthStencil.depth = depth;
+	clearValue.depthStencil.stencil = s;
+}
+
+void XVulkan::ClearColor(float r, float g, float b, float a)
+{
+	clearValue.color.float32[0] = r;
+	clearValue.color.float32[1] = g;
+	clearValue.color.float32[2] = b;
+	clearValue.color.float32[3] = a;
+}
+
+void XVulkan::ClearDepth(float depth)
+{
+	clearValue.depthStencil.depth = depth;
+}
+
+void XVulkan::ClearStencil(float s)
+{
+	clearValue.depthStencil.stencil = s;
 }
 
 bool XVulkan::ShouldClose()

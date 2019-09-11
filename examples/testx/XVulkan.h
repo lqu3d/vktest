@@ -20,6 +20,8 @@ struct XVkDepth {
 struct XVkBuffer {
 	VkDescriptorBufferInfo info;
 	VkDeviceMemory mem;
+	UINT* pIdxs;
+	UINT idxCnt;
 };
 
 #pragma endregion
@@ -39,6 +41,16 @@ public:
 	VkSwapchainKHR vkSwapchain;
 
 	XVkDepth vkDepth;
+
+	VkClearValue clearValue;
+	
+	VkViewport viewport;
+	VkRect2D scissor;
+
+	VkRenderPass vkRenderPass; //Î´¸³Öµ
+	VkPipeline vkPipeline; 
+	
+	VkFramebuffer* pFrameBuffers = NULL;
 
 	VkPhysicalDeviceMemoryProperties vkPhyDevMemProps;
 
@@ -65,23 +77,31 @@ private:
 
 	bool memory_type_from_properties(uint32_t typeBits, VkFlags requirements_mask, uint32_t* typeIndex);
 
+	void AcquireNextImage(VkSwapchainKHR swapChain, UINT* imgIdx);
 
 public:
 
 	void Setup();
 
 	void CreateBuffer(UINT size, VkBufferUsageFlagBits usage, VkMemoryPropertyFlagBits memMask, OUT XVkBuffer& xvkBuffer);
-
 	void WriteBuffer(XVkBuffer xvkBuffer, void* pdata, UINT size, UINT offset);
 
+	void SetViewPort(int x, int y, int width, int height);
+
+	void ClearColorDepthStencil(float r, float g, float b, float a, float depth, float s);
+	void ClearColor(float r, float g, float b, float a);
+	void ClearDepth(float f);
+	void ClearStencil(float f);
 	
 	void BeginCmdBuffer();
 	void EndCmdBuffer();
 
+	void BeginRenderPass();
+	void Draw(XVkBuffer* pBuff);
+	void EndRenderPass();
+
 	bool ShouldClose();
-
 	void CheckResult(VkResult err);
-
 	void Destroy();
 
 private:
