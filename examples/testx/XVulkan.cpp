@@ -182,11 +182,11 @@ void XVulkan::InitSwapChain()
 	ret = vkGetPhysicalDeviceSurfaceFormatsKHR(vkPhyDevice, vkSurface, &fmtCnt, fmts.data());
 	CheckResult(ret);
 
-	VkFormat imgFormat = VK_FORMAT_B8G8R8A8_UNORM;
+	vkSurfaceFmt = VK_FORMAT_B8G8R8A8_UNORM;
 	for (size_t i = 0; i < fmts.size(); i++)
 	{
 		if (fmts[i].format != VK_FORMAT_UNDEFINED) {
-			imgFormat = fmts[i].format;
+			vkSurfaceFmt = fmts[i].format;
 			break;
 		}
 	}
@@ -209,7 +209,7 @@ void XVulkan::InitSwapChain()
 	scinfo.surface = vkSurface;
 	scinfo.minImageCount = swapMinImages;
 	scinfo.imageExtent = swapChainExtent;
-	scinfo.imageFormat = imgFormat;
+	scinfo.imageFormat = vkSurfaceFmt;
 	scinfo.imageColorSpace = VK_COLORSPACE_SRGB_NONLINEAR_KHR;
 	scinfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
 	scinfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
@@ -442,9 +442,63 @@ void XVulkan::InitPiplineLayout()
 	VkPipelineLayoutCreateInfo pipinfo = {};
 	pipinfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
 	pipinfo.setLayoutCount = 1;
-	pipinfo.pSetLayouts = &layout; //
+	pipinfo.pSetLayouts = &layout; //多套布局
 
-	res = vkCreatePipelineLayout(vkDevice, &pipinfo, NULL, &vkPipelineLayout);
+	/***
+	*一般我们只需要一个渲染管线，对应一种管线布局
+	* 但我们可以预先设置多套管理布局，在需要时进行切换，就像U3D的高清渲染管线和简单渲染管线
+	* 但是如何决定使用哪一种的？？？？
+	*/
+	res = vkCreatePipelineLayout(vkDevice, &pipinfo, NULL, &vkPipelineLayout); 
+	CheckResult(res);
+}
+
+void XVulkan::InitRenderpass()
+{
+	bool clear = true;
+
+	VkAttachmentDescription attachments[2];
+
+	attachments[0].format = vkSurfaceFmt;
+	attachments[0].samples = VK_SAMPLE_COUNT_1_BIT;
+	attachments[0].initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+	attachments[0].finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+	attachments[0].loadOp = clear ? VK_ATTACHMENT_LOAD_OP_CLEAR : VK_ATTACHMENT_LOAD_OP_LOAD;
+	attachments[0].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+	attachments[0].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+	attachments[0].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+
+	attachments[1].format = vkDepth.format;
+	attachments[1].samples = VK_SAMPLE_COUNT_1_BIT;
+	attachments[1].initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+	attachments[1].finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+	attachments[1].loadOp = clear ? VK_ATTACHMENT_LOAD_OP_CLEAR : VK_ATTACHMENT_LOAD_OP_LOAD;
+	attachments[1].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+	attachments[1].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+	attachments[1].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+
+	VkAttachmentReference colorRef = {};
+	colorRef.attachment = 0;
+	colorRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+
+	VkAttachmentReference depthRef = {};
+	depthRef.attachment = 1;
+	depthRef.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+
+	VkSubpassDescription subPassInfo = {};
+	subPassInfo.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+	subPassInfo.colorAttachmentCount = 1;
+	subPassInfo.pColorAttachments = &colorRef;
+	subPassInfo.pDepthStencilAttachment = &depthRef;
+
+	VkRenderPassCreateInfo rpInfo = {};
+	rpInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+	rpInfo.attachmentCount = 2;
+	rpInfo.pAttachments = attachments;
+	rpInfo.subpassCount = 1;
+	rpInfo.pSubpasses = &subPassInfo;
+
+	VkResult res = vkCreateRenderPass(vkDevice, &rpInfo, NULL, &vkRenderPass);
 	CheckResult(res);
 }
 

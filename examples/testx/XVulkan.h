@@ -39,6 +39,9 @@ public:
 	VkCommandBuffer vkCmdBuffer;
 
 	VkSwapchainKHR vkSwapchain;
+	VkFormat vkSurfaceFmt;
+
+	VkFormat vkDepthFmt;
 
 	XVkDepth vkDepth;
 
@@ -79,6 +82,7 @@ private:
 
 	void InitPiplineLayout();
 
+	void InitRenderpass();
 
 	bool memory_type_from_properties(uint32_t typeBits, VkFlags requirements_mask, uint32_t* typeIndex);
 
