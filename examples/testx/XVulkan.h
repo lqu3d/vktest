@@ -27,7 +27,7 @@ struct XVkBuffer {
 class XVulkan
 {
 public:
-	XWindow xWnd;
+
 	VkSurfaceKHR vkSurface;
 	VkInstance vkInst;
 	VkPhysicalDevice vkPhyDevice;

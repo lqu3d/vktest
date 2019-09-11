@@ -42,10 +42,10 @@ protected:
 
 	void Clear();
 
-	void OnDestroy();
+	void Destroy();
 };
 
-extern XObjectMgr objMgr;
+extern XObjectMgr xobjMgr;
 
 
 

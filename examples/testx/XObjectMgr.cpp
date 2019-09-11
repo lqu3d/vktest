@@ -2,7 +2,7 @@
 #include "XObjectMgr.h"
 #include "XUtils.h"
 
-XObjectMgr objMgr;
+XObjectMgr xobjMgr;
 
 /***
 *这里在回收时要不要做对象池处理？
@@ -77,7 +77,7 @@ void XObjectMgr::Clear()
 	pObjList->clear();
 }
 
-void XObjectMgr::OnDestroy()
+void XObjectMgr::Destroy()
 {
 	Clear();
 

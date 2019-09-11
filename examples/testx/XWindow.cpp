@@ -4,6 +4,7 @@
 #include<string>	
 #include<assert.h>
 
+XWindow xWnd;
 bool XWindow::shouldClose = false; //静态变量需要在全局空间初始化
 
 void XWindow::Init() {

@@ -1,7 +1,8 @@
 #include "XGameMgr.h"
-#include "XVulkan.h"
+#include "XWindow.h"
 #include "XGame.h"
 #include "XObjectMgr.h"
+#include "XRender.h"
 
 XGame xgame;
 
@@ -21,25 +22,18 @@ XGameMgr* XGameMgr::get()
 
 void XGameMgr::Start()
 {
-	xvk.Setup();
-
-	objMgr.Start();
+	xobjMgr.Start();
 	xgame.Start();
+	xrender.Start();
 
-	xvk.BeginCmdBuffer();
-
-
-	
-
-	xvk.EndCmdBuffer();
 }
 
 void XGameMgr::Loop()
 {
-	while (!xvk.xWnd.ShouldClose()) {
-		xvk.xWnd.PollEvents();
+	while (!xWnd.ShouldClose()) {
+		xWnd.PollEvents();
 
-		objMgr.Update();
+		xobjMgr.Update();
 		xgame.Update();
 	}
 }
@@ -49,12 +43,11 @@ void XGameMgr::Loop()
 */
 void XGameMgr::Clear()
 {
-	objMgr.Clear();
+	xobjMgr.Clear();
 }
 
 void XGameMgr::Destroy()
 {
-	objMgr.OnDestroy();
-	xgame.OnDestroy();
-	xvk.Destroy();
+	xobjMgr.Destroy();
+	xgame.Destroy();
 }

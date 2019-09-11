@@ -1,12 +1,12 @@
 #include <glm/ext.hpp>
 
 #include "XCamera.h"
-#include "XVulkan.h"
+#include "XWindow.h"
 
 XCamera::XCamera(XGameObject* gameObject):XComponent(gameObject)
 {
-	width = xvk.xWnd.width;
-	height = xvk.xWnd.height;
+	width = xWnd.width;
+	height = xWnd.height;
 	__tmProj = mat4(1);
 }
 

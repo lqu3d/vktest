@@ -10,7 +10,7 @@
 
 void XGame::Start()
 {
-	XGameObject* go = objMgr.AddObject<XGameObject>();
+	XGameObject* go = xobjMgr.AddObject<XGameObject>();
 	XCamera* cam = go->AddComponent<XCamera>();
 	//cam->gameObject.
 	auto trans = cam->gameObject->transform;
@@ -30,6 +30,6 @@ void XGame::Update()
 {
 }
 
-void XGame::OnDestroy()
+void XGame::Destroy()
 {
 }

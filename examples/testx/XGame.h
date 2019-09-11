@@ -8,7 +8,7 @@ protected:
 
 	void Update();
 
-	void OnDestroy();
+	void Destroy();
 };
 
 
