@@ -84,9 +84,17 @@ private:
 
 	void InitRenderpass();
 
+	void InitShaders();
+
+
+#pragma region ¹¤¾ßº¯Êý
+
 	bool memory_type_from_properties(uint32_t typeBits, VkFlags requirements_mask, uint32_t* typeIndex);
 
 	void AcquireNextImage(VkSwapchainKHR swapChain, UINT* imgIdx);
+
+#pragma endregion
+
 
 public:
 
