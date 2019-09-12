@@ -1,8 +1,10 @@
 #include <iostream>
+#include <glslang/Include/ShHandle.h>
 
 #include "XVulkan.h"
 #include"XWindow.h"
 #include "XModel.h"
+
 
 XVulkan xvk;
 void XVulkan::InitInstance()
@@ -500,6 +502,14 @@ void XVulkan::InitRenderpass()
 
 	VkResult res = vkCreateRenderPass(vkDevice, &rpInfo, NULL, &vkRenderPass);
 	CheckResult(res);
+}
+
+void XVulkan::InitShaders()
+{
+	//glslang::InitializeProcess();
+
+	//
+	//glslang::FinalizeProcess();
 }
 
 void XVulkan::SetViewPort(int x, int y, int width, int height)
