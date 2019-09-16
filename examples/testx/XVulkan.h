@@ -20,8 +20,6 @@ struct XVkImage {
 struct XVkBuffer {
 	VkDescriptorBufferInfo info;
 	VkDeviceMemory mem;
-	UINT* pIdxs;
-	UINT idxCnt;
 };
 
 struct XVKFrameBuffer {
@@ -112,6 +110,7 @@ public:
 
 	void CreateBuffer(UINT size, VkBufferUsageFlagBits usage, VkMemoryPropertyFlagBits memMask, OUT XVkBuffer& xvkBuffer);
 	void WriteBuffer(XVkBuffer xvkBuffer, void* pdata, UINT size, UINT offset);
+	void FreeBuffer(XVkBuffer xvkBuffer);
 
 	void SetViewPort(int x, int y, int width, int height);
 
@@ -123,7 +122,7 @@ public:
 	void BeginCmdBuffer();
 
 	void BeginRenderPass();
-	void Draw(XVkBuffer* pBuff);
+	void Draw(XVkBuffer* pBuff, int vertCnt);
 	void EndRenderPass();
 
 	void EndCmdBuffer();

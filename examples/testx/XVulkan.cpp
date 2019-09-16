@@ -159,10 +159,10 @@ void XVulkan::BeginRenderPass()
 
 }
 
-void XVulkan::Draw(XVkBuffer* pBuff)
+void XVulkan::Draw(XVkBuffer* pBuff, int vertCnt)
 {
 	vkCmdBindVertexBuffers(vkCmdBuffer, 0, 1, &(pBuff->info.buffer), &(pBuff->info.offset));
-	vkCmdDrawIndexed(vkCmdBuffer, pBuff->idxCnt, 1, 0, 0, 0);
+	vkCmdDraw(vkCmdBuffer, vertCnt, 1, 0, 0);
 }
 
 void XVulkan::EndRenderPass()
@@ -403,6 +403,12 @@ void XVulkan::WriteBuffer(XVkBuffer xvkBuffer, void* pdata, UINT size, UINT offs
 
 	vkUnmapMemory(vkDevice, xvkBuffer.mem);
 
+}
+
+void XVulkan::FreeBuffer(XVkBuffer xvkBuffer)
+{
+	vkFreeMemory(vkDevice, xvkBuffer.mem, NULL);
+	
 }
 
 void XVulkan::AcquireNextImage(VkSwapchainKHR swapChain, UINT* imgIdx)
