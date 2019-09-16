@@ -1,5 +1,5 @@
 #include <iostream>
-#include <glslang/Include/ShHandle.h>
+#include <fstream>
 
 #include "XVulkan.h"
 #include"XWindow.h"
@@ -504,12 +504,41 @@ void XVulkan::InitRenderpass()
 	CheckResult(res);
 }
 
-void XVulkan::InitShaders()
+void XVulkan::InitShaderStages(std::vector<UINT> vsCode, std::vector<UINT> psCode)
 {
-	//glslang::InitializeProcess();
+	if (vsCode.size() == 0 || psCode.size() == 0) {
+		printf("InitShader ß∞‹");
+		return;
+	}
 
-	//
-	//glslang::FinalizeProcess();
+	UINT isize = sizeof(UINT);
+	VkShaderModule vsModule, psModule;
+
+	VkShaderModuleCreateInfo minfo = {};
+	minfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+	
+	minfo.codeSize = vsCode.size() * isize;
+	minfo.pCode = vsCode.data();
+	auto ret = vkCreateShaderModule(vkDevice, &minfo, NULL, &vsModule);
+	CheckResult(ret);
+
+	minfo.codeSize = psCode.size() * isize;
+	minfo.pCode = psCode.data();
+	ret = vkCreateShaderModule(vkDevice, &minfo, NULL, &psModule);
+	CheckResult(ret);
+
+
+	vkShaderStages[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+	vkShaderStages[0].stage = VK_SHADER_STAGE_VERTEX_BIT;
+	vkShaderStages[0].pName = "vsMain";
+	vkShaderStages[0].module = vsModule;
+
+	vkShaderStages[1].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+	vkShaderStages[1].stage = VK_SHADER_STAGE_FRAGMENT_BIT;
+	vkShaderStages[1].pName = "psMain";
+	vkShaderStages[0].module = psModule;
+
+
 }
 
 void XVulkan::SetViewPort(int x, int y, int width, int height)

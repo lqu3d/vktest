@@ -54,7 +54,8 @@ public:
 	VkPipelineLayout vkPipelineLayout;
 
 	VkPipeline vkPipeline; 
-	
+	VkPipelineShaderStageCreateInfo vkShaderStages[2]; //只有vs, ps
+
 	VkFramebuffer* pFrameBuffers = NULL;
 
 	VkPhysicalDeviceMemoryProperties vkPhyDevMemProps;
@@ -84,7 +85,7 @@ private:
 
 	void InitRenderpass();
 
-	void InitShaders();
+	void InitShaderStages(std::vector<UINT> vsCode, std::vector<UINT> psCode);
 
 
 #pragma region 工具函数
