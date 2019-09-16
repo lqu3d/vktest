@@ -10,11 +10,11 @@
 #include "XWindow.h"
 
 #pragma region struct
-struct XVkDepth {
+struct XVkImage {
 	VkFormat format;
 	VkImage image;
+	VkImageView view;
 	VkDeviceMemory mem;
-	VkImageView imgView;
 };
 
 struct XVkBuffer {
@@ -22,6 +22,12 @@ struct XVkBuffer {
 	VkDeviceMemory mem;
 	UINT* pIdxs;
 	UINT idxCnt;
+};
+
+struct XVKFrameBuffer {
+	VkFramebuffer frameBuffer;
+	VkImage image;
+	VkImageView view;
 };
 
 #pragma endregion
@@ -43,7 +49,7 @@ public:
 
 	VkFormat vkDepthFmt;
 
-	XVkDepth vkDepth;
+	XVkImage vkDepth;
 
 	VkClearValue clearValue;
 	
@@ -55,6 +61,8 @@ public:
 
 	VkPipeline vkPipeline; 
 	VkPipelineShaderStageCreateInfo vkShaderStages[2]; //只有vs, ps
+
+	std::vector<XVKFrameBuffer> xvkFrameBuffers;
 
 	VkFramebuffer* pFrameBuffers = NULL;
 
@@ -87,6 +95,7 @@ private:
 
 	void InitShaderStages(std::vector<UINT> vsCode, std::vector<UINT> psCode);
 
+	void InitFrameBuffers();
 
 #pragma region 工具函数
 

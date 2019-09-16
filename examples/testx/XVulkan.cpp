@@ -303,7 +303,7 @@ void XVulkan::InitDepthBuffer()
 	viewinfo.subresourceRange.layerCount = 1;
 	viewinfo.subresourceRange.baseArrayLayer = 0;
 
-	ret = vkCreateImageView(vkDevice, &viewinfo, NULL, &vkDepth.imgView);
+	ret = vkCreateImageView(vkDevice, &viewinfo, NULL, &vkDepth.view);
 	CheckResult(ret);
 
 }
@@ -539,6 +539,55 @@ void XVulkan::InitShaderStages(std::vector<UINT> vsCode, std::vector<UINT> psCod
 	vkShaderStages[0].module = psModule;
 
 
+}
+
+void XVulkan::InitFrameBuffers()
+{
+	UINT swapChainCnt = 0;
+	auto ret = vkGetSwapchainImagesKHR(vkDevice, vkSwapchain, &swapChainCnt, NULL);
+	CheckResult(ret);
+
+	std::vector<VkImage> images(swapChainCnt);
+
+	ret = vkGetSwapchainImagesKHR(vkDevice, vkSwapchain, &swapChainCnt, images.data());
+	CheckResult(ret);
+
+	VkImageViewCreateInfo viewInfo = {};
+	viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+	viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+	viewInfo.format = vkSurfaceFmt;
+	viewInfo.components.r = VK_COMPONENT_SWIZZLE_R;
+	viewInfo.components.g = VK_COMPONENT_SWIZZLE_G;
+	viewInfo.components.b = VK_COMPONENT_SWIZZLE_B;
+	viewInfo.components.a = VK_COMPONENT_SWIZZLE_A;
+	viewInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+	viewInfo.subresourceRange.baseMipLevel = 0;
+	viewInfo.subresourceRange.levelCount = 1;
+	viewInfo.subresourceRange.baseArrayLayer = 0;
+	viewInfo.subresourceRange.layerCount = 1;
+
+	VkImageView attachments[2];
+	VkFramebufferCreateInfo fbInfo = {};
+	fbInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+	fbInfo.renderPass = vkRenderPass;
+	fbInfo.attachmentCount = 2;
+	fbInfo.pAttachments = attachments;
+	fbInfo.width = xWnd.width;
+	fbInfo.height = xWnd.height;
+	fbInfo.layers = 1;
+
+	xvkFrameBuffers.resize(swapChainCnt);
+	for (size_t i = 0; i < swapChainCnt; i++)
+	{
+		xvkFrameBuffers[i].image = images[i]; //image
+
+		viewInfo.image = images[i];
+		ret = vkCreateImageView(vkDevice, &viewInfo, NULL, &xvkFrameBuffers[i].view); //view
+
+		attachments[0] = xvkFrameBuffers[i].view;
+		attachments[1] = vkDepth.view;
+		ret = vkCreateFramebuffer(vkDevice, &fbInfo, NULL, &xvkFrameBuffers[i].frameBuffer); //frameBuffer
+	}
 }
 
 void XVulkan::SetViewPort(int x, int y, int width, int height)
