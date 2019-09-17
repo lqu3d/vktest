@@ -91,8 +91,6 @@ private:
 
 	void InitRenderpass();
 
-	void InitShaderStages(std::vector<UINT> vsCode, std::vector<UINT> psCode);
-
 	void InitFrameBuffers();
 
 #pragma region ¹¤¾ßº¯Êý
@@ -111,6 +109,8 @@ public:
 	void CreateBuffer(UINT size, VkBufferUsageFlagBits usage, VkMemoryPropertyFlagBits memMask, OUT XVkBuffer& xvkBuffer);
 	void WriteBuffer(XVkBuffer xvkBuffer, void* pdata, UINT size, UINT offset);
 	void FreeBuffer(XVkBuffer xvkBuffer);
+	
+	void SetShaderStages(std::vector<UINT> vsCode, std::vector<UINT> psCode);
 
 	void SetViewPort(int x, int y, int width, int height);
 

@@ -20,6 +20,11 @@ void XVulkan::InitInstance()
 	info.ppEnabledExtensionNames = vkInstExtens.data(); //(const char**)vkInstExtensions.data()->c_str();
 	auto ret = vkCreateInstance(&info, NULL, &vkInst);
 	CheckResult(ret);
+
+	for (size_t i = 0; i < 2; i++)
+	{
+		vkShaderStages[i].module = VK_NULL_HANDLE;
+	}
 }
 
 void XVulkan::InitWindow()
@@ -510,11 +515,18 @@ void XVulkan::InitRenderpass()
 	CheckResult(res);
 }
 
-void XVulkan::InitShaderStages(std::vector<UINT> vsCode, std::vector<UINT> psCode)
+void XVulkan::SetShaderStages(std::vector<UINT> vsCode, std::vector<UINT> psCode)
 {
 	if (vsCode.size() == 0 || psCode.size() == 0) {
 		printf("InitShader ß∞‹");
 		return;
+	}
+
+	for (size_t i = 0; i < 2; i++)
+	{
+		if (vkShaderStages[i].module != VK_NULL_HANDLE) {
+			vkDestroyShaderModule(vkDevice, vkShaderStages[i].module, NULL);
+		}
 	}
 
 	UINT isize = sizeof(UINT);
@@ -543,6 +555,7 @@ void XVulkan::InitShaderStages(std::vector<UINT> vsCode, std::vector<UINT> psCod
 	vkShaderStages[1].stage = VK_SHADER_STAGE_FRAGMENT_BIT;
 	vkShaderStages[1].pName = "psMain";
 	vkShaderStages[0].module = psModule;
+
 
 
 }
