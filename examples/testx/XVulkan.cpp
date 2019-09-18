@@ -21,10 +21,6 @@ void XVulkan::InitInstance()
 	auto ret = vkCreateInstance(&info, NULL, &vkInst);
 	CheckResult(ret);
 
-	for (size_t i = 0; i < 2; i++)
-	{
-		vkShaderStages[i].module = VK_NULL_HANDLE;
-	}
 }
 
 void XVulkan::InitWindow()
@@ -313,7 +309,6 @@ void XVulkan::InitDepthBuffer()
 
 }
 
-
 bool XVulkan::memory_type_from_properties(uint32_t typeBits, VkFlags requirements_mask, uint32_t* typeIndex) {
 	vkGetPhysicalDeviceMemoryProperties(vkPhyDevice, &vkPhyDevMemProps);
 
@@ -416,7 +411,44 @@ void XVulkan::FreeBuffer(XVkBuffer xvkBuffer)
 	
 }
 
-void XVulkan::CreateDiffusePipeline(VkPipeline& pipeline)
+//创建一个只有VS,PS两个阶段的管线
+void XVulkan::CreatePiplineLayout(int vsDescriptorCnt, int psDescriptorCnt, VkPipelineLayout& pipLayout)
+{
+	VkDescriptorSetLayoutBinding binding[2] = {};
+	binding[0].binding = 0;
+	binding[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER; //uniform buffer
+	binding[0].stageFlags = VK_SHADER_STAGE_VERTEX_BIT; //vertext shader
+	binding[0].descriptorCount = vsDescriptorCnt; //vertext shader中的变量个数，现在我们只有一个mvp矩阵
+
+	binding[1].binding = 1;
+	binding[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER; //图片采样器
+	binding[1].stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT; //pixel shader
+	binding[1].descriptorCount = psDescriptorCnt; //pixel shader中的变量个数，现在我们只有一个图片的sampler
+
+	VkDescriptorSetLayoutCreateInfo layinfo = {};
+	layinfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+	layinfo.bindingCount = 2;
+	layinfo.pBindings = binding;
+
+	VkDescriptorSetLayout layout;
+	VkResult res = vkCreateDescriptorSetLayout(vkDevice, &layinfo, NULL, &layout);
+	CheckResult(res);
+
+	VkPipelineLayoutCreateInfo pipinfo = {};
+	pipinfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+	pipinfo.setLayoutCount = 1;
+	pipinfo.pSetLayouts = &layout; //多套布局
+
+	/***
+	*一般我们只需要一个渲染管线，对应一种管线布局
+	* 但我们可以预先设置多套管理布局，在需要时进行切换，就像U3D的高清渲染管线和简单渲染管线
+	* 但是如何决定使用哪一种的？？？？
+	*/
+	res = vkCreatePipelineLayout(vkDevice, &pipinfo, NULL, &pipLayout);
+	CheckResult(res);
+}
+
+void XVulkan::CreateDiffusePipeline(std::vector<UINT> vsCode, std::vector<UINT> psCode, VkPipeline& pipeline)
 {
 	//顶点格式
 	VkVertexInputBindingDescription bindDesc = {};
@@ -476,22 +508,63 @@ void XVulkan::CreateDiffusePipeline(VkPipeline& pipeline)
 	vpi.pScissors = NULL; //置为空，因为我们使用的是动态视口
 
 	//创建管线
+	VkPipelineLayout pipLayout;
+	CreatePiplineLayout(1, 1, pipLayout);
+
+	VkPipelineShaderStageCreateInfo stages[2];
+	CreateShaderStages(vsCode, psCode, stages);
+
 	VkGraphicsPipelineCreateInfo info = {};
 	info.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
-	info.layout = vkPipelineLayout; //todo: 专用化
+	info.layout = pipLayout; //todo: 专用化
 	info.pVertexInputState = &vi;
 	info.pInputAssemblyState = &ai;
 	info.pRasterizationState = &ri;
 	info.pDepthStencilState = &dsi;
 	info.renderPass = vkRenderPass;
 	info.stageCount = 2;
-	info.pStages = vkShaderStages;
+	info.pStages = stages;
 	info.pDynamicState = &dyi;
 	info.pViewportState = &vpi;
 	
 	auto ret = vkCreateGraphicsPipelines(vkDevice, vkPipelineCache, 1, &info, NULL, &pipeline);
 	CheckResult(ret);
 
+}
+
+//创建vs,ps模块
+void XVulkan::CreateShaderStages(std::vector<UINT> vsCode, std::vector<UINT> psCode,VkPipelineShaderStageCreateInfo* pStagesInfo)
+{
+	if (vsCode.size() == 0 || psCode.size() == 0) {
+		printf("InitShader失败");
+		return;
+	}
+
+	UINT isize = sizeof(UINT);
+	VkShaderModule vsModule, psModule;
+
+	VkShaderModuleCreateInfo minfo = {};
+	minfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+
+	minfo.codeSize = vsCode.size() * isize;
+	minfo.pCode = vsCode.data();
+	auto ret = vkCreateShaderModule(vkDevice, &minfo, NULL, &vsModule);
+	CheckResult(ret);
+
+	minfo.codeSize = psCode.size() * isize;
+	minfo.pCode = psCode.data();
+	ret = vkCreateShaderModule(vkDevice, &minfo, NULL, &psModule);
+	CheckResult(ret);
+
+	pStagesInfo[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+	pStagesInfo[0].stage = VK_SHADER_STAGE_VERTEX_BIT;
+	pStagesInfo[0].pName = "vsMain";
+	pStagesInfo[0].module = vsModule;
+
+	pStagesInfo[1].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+	pStagesInfo[1].stage = VK_SHADER_STAGE_FRAGMENT_BIT;
+	pStagesInfo[1].pName = "psMain";
+	pStagesInfo[1].module = psModule;
 }
 
 void XVulkan::AcquireNextImage(VkSwapchainKHR swapChain, UINT* imgIdx)
@@ -506,42 +579,6 @@ void XVulkan::AcquireNextImage(VkSwapchainKHR swapChain, UINT* imgIdx)
 	res = vkAcquireNextImageKHR(vkDevice, vkSwapchain, UINT64_MAX, imgAccSemaphore, NULL, imgIdx);
 	CheckResult(res);
 
-}
-
-void XVulkan::InitPiplineLayout()
-{
-	VkDescriptorSetLayoutBinding binding[2] = {};
-	binding[0].binding = 0;
-	binding[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER; //uniform buffer
-	binding[0].stageFlags = VK_SHADER_STAGE_VERTEX_BIT; //vertext shader
-	binding[0].descriptorCount = 1; //vertext shader中的变量个数，现在我们只有一个mvp矩阵
-
-	binding[1].binding = 1;
-	binding[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER; //图片采样器
-	binding[1].stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT; //pixel shader
-	binding[1].descriptorCount = 1; //pixel shader中的变量个数，现在我们只有一个图片的sampler
-
-	VkDescriptorSetLayoutCreateInfo layinfo = {};
-	layinfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-	layinfo.bindingCount = 2;
-	layinfo.pBindings = binding;
-
-	VkDescriptorSetLayout layout;
-	VkResult res = vkCreateDescriptorSetLayout(vkDevice, &layinfo, NULL, &layout);
-	CheckResult(res);
-
-	VkPipelineLayoutCreateInfo pipinfo = {};
-	pipinfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-	pipinfo.setLayoutCount = 1;
-	pipinfo.pSetLayouts = &layout; //多套布局
-
-	/***
-	*一般我们只需要一个渲染管线，对应一种管线布局
-	* 但我们可以预先设置多套管理布局，在需要时进行切换，就像U3D的高清渲染管线和简单渲染管线
-	* 但是如何决定使用哪一种的？？？？
-	*/
-	res = vkCreatePipelineLayout(vkDevice, &pipinfo, NULL, &vkPipelineLayout); 
-	CheckResult(res);
 }
 
 void XVulkan::InitRenderpass()
@@ -593,48 +630,7 @@ void XVulkan::InitRenderpass()
 	CheckResult(res);
 }
 
-void XVulkan::SetShaderStages(std::vector<UINT> vsCode, std::vector<UINT> psCode)
-{
-	if (vsCode.size() == 0 || psCode.size() == 0) {
-		printf("InitShader失败");
-		return;
-	}
 
-	for (size_t i = 0; i < 2; i++)
-	{
-		if (vkShaderStages[i].module != VK_NULL_HANDLE) {
-			vkDestroyShaderModule(vkDevice, vkShaderStages[i].module, NULL);
-		}
-	}
-
-	UINT isize = sizeof(UINT);
-	VkShaderModule vsModule, psModule;
-
-	VkShaderModuleCreateInfo minfo = {};
-	minfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-	
-	minfo.codeSize = vsCode.size() * isize;
-	minfo.pCode = vsCode.data();
-	auto ret = vkCreateShaderModule(vkDevice, &minfo, NULL, &vsModule);
-	CheckResult(ret);
-
-	minfo.codeSize = psCode.size() * isize;
-	minfo.pCode = psCode.data();
-	ret = vkCreateShaderModule(vkDevice, &minfo, NULL, &psModule);
-	CheckResult(ret);
-
-
-	vkShaderStages[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-	vkShaderStages[0].stage = VK_SHADER_STAGE_VERTEX_BIT;
-	vkShaderStages[0].pName = "vsMain";
-	vkShaderStages[0].module = vsModule;
-
-	vkShaderStages[1].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-	vkShaderStages[1].stage = VK_SHADER_STAGE_FRAGMENT_BIT;
-	vkShaderStages[1].pName = "psMain";
-	vkShaderStages[0].module = psModule;
-
-}
 void XVulkan::InitFrameBuffers()
 {
 	UINT swapChainCnt = 0;

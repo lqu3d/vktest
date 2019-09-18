@@ -61,12 +61,9 @@ public:
 	VkRect2D scissor;
 
 	VkRenderPass vkRenderPass; //未赋值
-	VkPipelineLayout vkPipelineLayout;
 
 	VkPipeline vkPipeline; 
 	VkPipelineCache vkPipelineCache;
-
-	VkPipelineShaderStageCreateInfo vkShaderStages[2]; //只有vs, ps
 
 	std::vector<XVKFrameBuffer> xvkFrameBuffers;
 
@@ -96,7 +93,6 @@ private:
 	void InitSwapChain();
 	void InitDepthBuffer();
 
-	void InitPiplineLayout();
 
 	void InitRenderpass();
 
@@ -121,9 +117,11 @@ public:
 	void WriteBuffer(XVkBuffer xvkBuffer, void* pdata, UINT size, UINT offset);
 	void FreeBuffer(XVkBuffer xvkBuffer);
 
-	void CreateDiffusePipeline(VkPipeline& pipeline); //漫反射效果渲染管线
+	void CreatePiplineLayout(int vsDescriptorCnt, int psDescriptorCnt, VkPipelineLayout& pipLayout);
 
-	void SetShaderStages(std::vector<UINT> vsCode, std::vector<UINT> psCode);
+	void CreateDiffusePipeline(std::vector<UINT> vsCode, std::vector<UINT> psCode, VkPipeline& pipeline); //漫反射效果渲染管线
+
+	void CreateShaderStages(std::vector<UINT> vsCode, std::vector<UINT> psCode, VkPipelineShaderStageCreateInfo* pStagesInfo);
 
 	void SetViewPort(int x, int y, int width, int height);
 
