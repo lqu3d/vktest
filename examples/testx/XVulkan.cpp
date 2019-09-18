@@ -358,7 +358,7 @@ void XVulkan::Setup()
 
 	InitCmdBuffer();
 
-
+	InitPipelineCache();
 }
 
 /***
@@ -414,6 +414,84 @@ void XVulkan::FreeBuffer(XVkBuffer xvkBuffer)
 {
 	vkFreeMemory(vkDevice, xvkBuffer.mem, NULL);
 	
+}
+
+void XVulkan::CreateDiffusePipeline(VkPipeline& pipeline)
+{
+	//顶点格式
+	VkVertexInputBindingDescription bindDesc = {};
+	bindDesc.binding = 0;
+	bindDesc.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+	bindDesc.stride = sizeof(XVKVert);
+
+	VkVertexInputAttributeDescription attrDesc[3] = {};
+	for (size_t i = 0; i < 3; i++)
+	{
+		attrDesc[i].binding = 0;
+		attrDesc[i].format = VK_FORMAT_R32G32B32_SFLOAT;
+		attrDesc[i].location = i;
+		attrDesc[i].offset = 0;
+	}
+
+	//状态一，顶点输入
+	VkPipelineVertexInputStateCreateInfo vi = {};
+	vi.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+	vi.vertexBindingDescriptionCount = 1;
+	vi.pVertexBindingDescriptions = &bindDesc;
+	vi.vertexAttributeDescriptionCount = 3;
+	vi.pVertexAttributeDescriptions = attrDesc;
+
+	//状态二，图元装配
+	VkPipelineInputAssemblyStateCreateInfo ai = {};
+	ai.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
+	ai.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+
+	//状态三，光栅化
+	VkPipelineRasterizationStateCreateInfo ri = {};
+	ri.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
+	ri.polygonMode = VK_POLYGON_MODE_FILL;
+	ri.cullMode = VK_CULL_MODE_BACK_BIT;
+	ri.frontFace = VK_FRONT_FACE_CLOCKWISE;
+	ri.lineWidth = 1.0f;
+
+	//状态四，深度测试
+	VkPipelineDepthStencilStateCreateInfo dsi = {};
+	dsi.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
+	dsi.depthTestEnable = VK_TRUE;
+	dsi.depthWriteEnable = VK_TRUE;
+	dsi.depthCompareOp = VK_COMPARE_OP_LESS_OR_EQUAL;
+
+	//状态五，动态视口，窗口尺寸改变时就不必重新创建管线，这与设备丢失有关系吗？？
+	VkDynamicState dynamicStates[2] = {VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
+	VkPipelineDynamicStateCreateInfo dyi = {};
+	dyi.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
+	dyi.dynamicStateCount = 2;
+	dyi.pDynamicStates = dynamicStates;
+
+	VkPipelineViewportStateCreateInfo vpi = {};
+	vpi.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+	vpi.viewportCount = 1;
+	vpi.scissorCount = 1;
+	vpi.pViewports = NULL; //置为空，因为我们使用的是动态视口
+	vpi.pScissors = NULL; //置为空，因为我们使用的是动态视口
+
+	//创建管线
+	VkGraphicsPipelineCreateInfo info = {};
+	info.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+	info.layout = vkPipelineLayout; //todo: 专用化
+	info.pVertexInputState = &vi;
+	info.pInputAssemblyState = &ai;
+	info.pRasterizationState = &ri;
+	info.pDepthStencilState = &dsi;
+	info.renderPass = vkRenderPass;
+	info.stageCount = 2;
+	info.pStages = vkShaderStages;
+	info.pDynamicState = &dyi;
+	info.pViewportState = &vpi;
+	
+	auto ret = vkCreateGraphicsPipelines(vkDevice, vkPipelineCache, 1, &info, NULL, &pipeline);
+	CheckResult(ret);
+
 }
 
 void XVulkan::AcquireNextImage(VkSwapchainKHR swapChain, UINT* imgIdx)
@@ -556,10 +634,7 @@ void XVulkan::SetShaderStages(std::vector<UINT> vsCode, std::vector<UINT> psCode
 	vkShaderStages[1].pName = "psMain";
 	vkShaderStages[0].module = psModule;
 
-
-
 }
-
 void XVulkan::InitFrameBuffers()
 {
 	UINT swapChainCnt = 0;
@@ -607,6 +682,14 @@ void XVulkan::InitFrameBuffers()
 		attachments[1] = vkDepth.view;
 		ret = vkCreateFramebuffer(vkDevice, &fbInfo, NULL, &xvkFrameBuffers[i].frameBuffer); //frameBuffer
 	}
+}
+
+void XVulkan::InitPipelineCache()
+{
+	VkPipelineCacheCreateInfo info = {};
+	info.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
+	auto ret = vkCreatePipelineCache(vkDevice, &info, NULL, &vkPipelineCache);
+	CheckResult(ret);
 }
 
 void XVulkan::SetViewPort(int x, int y, int width, int height)

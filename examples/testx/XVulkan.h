@@ -28,6 +28,12 @@ struct XVKFrameBuffer {
 	VkImageView view;
 };
 
+struct XVKVert {
+	float x, y, z;
+	float nx, ny, nz;
+	float u, v, w;
+};
+
 #pragma endregion
 
 class XVulkan
@@ -58,6 +64,8 @@ public:
 	VkPipelineLayout vkPipelineLayout;
 
 	VkPipeline vkPipeline; 
+	VkPipelineCache vkPipelineCache;
+
 	VkPipelineShaderStageCreateInfo vkShaderStages[2]; //只有vs, ps
 
 	std::vector<XVKFrameBuffer> xvkFrameBuffers;
@@ -65,6 +73,7 @@ public:
 	VkFramebuffer* pFrameBuffers = NULL;
 
 	VkPhysicalDeviceMemoryProperties vkPhyDevMemProps;
+
 
 	int vkQueueFamilyIdx;
 
@@ -93,6 +102,8 @@ private:
 
 	void InitFrameBuffers();
 
+	void InitPipelineCache(); //目前没什么用，空的流程
+
 #pragma region 工具函数
 
 	bool memory_type_from_properties(uint32_t typeBits, VkFlags requirements_mask, uint32_t* typeIndex);
@@ -109,7 +120,9 @@ public:
 	void CreateBuffer(UINT size, VkBufferUsageFlagBits usage, VkMemoryPropertyFlagBits memMask, OUT XVkBuffer& xvkBuffer);
 	void WriteBuffer(XVkBuffer xvkBuffer, void* pdata, UINT size, UINT offset);
 	void FreeBuffer(XVkBuffer xvkBuffer);
-	
+
+	void CreateDiffusePipeline(VkPipeline& pipeline); //漫反射效果渲染管线
+
 	void SetShaderStages(std::vector<UINT> vsCode, std::vector<UINT> psCode);
 
 	void SetViewPort(int x, int y, int width, int height);
