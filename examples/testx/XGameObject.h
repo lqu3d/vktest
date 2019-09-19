@@ -36,6 +36,7 @@ public:
 	template<typename T> T* AddComponent() {
 		//显式赋值，用于检查T是不是XComponent的子类
 		XComponent* go = new T(this);
+		go->OnStart();
 
 		objList->push_back(go);
 		return (T*)go;
@@ -68,6 +69,8 @@ public:
 		{
 			T* po = dynamic_cast<T*>((*objList)[i]);
 			if (po != NULL) {
+				po->OnDestroy();
+
 				X_OBJ_RELEASE(*iter);
 				objList->erase(iter);
 				break;
