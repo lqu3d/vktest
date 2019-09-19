@@ -6,6 +6,7 @@
 #include<vector>
 #include<string>
 
+#include "XUtils.h"
 #include "XObject.h"
 #include "XTransform.h"
 
@@ -44,8 +45,8 @@ public:
 	template<typename T> T* GetComponent() {
 		for (size_t i = 0; i < objList->size(); i++)
 		{
-			if (XSameType<T, decltype((*objList)[i])>())
-				return (*objList)[i];
+			if (XUtils::XSameType<T, decltype((*objList)[i])>())
+				return (T*)(*objList)[i];
 		}
 
 		return NULL;
@@ -54,7 +55,7 @@ public:
 	template<typename T> void RemoveComponent() {
 		for (auto iter = objList->begin(); iter != objList->end(); ++iter)
 		{
-			if (XSameType<T, decltype(*iter)>())
+			if (XUtils::XSameType<T, decltype(*iter)>())
 			{
 				X_OBJ_RELEASE(*iter);
 				objList->erase(iter);
