@@ -63,6 +63,9 @@
     <ClCompile Include="XRender.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="XMesh.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="XGameMgr.h">
@@ -108,6 +111,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="XRender.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="XMesh.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

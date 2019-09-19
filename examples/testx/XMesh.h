@@ -1,18 +1,22 @@
 #pragma once
 #include "XComponent.h"
+
+struct XVKVert;
+
 class XMesh :
 	public XComponent
 {
-	UINT vertCnt;
-	UINT* pData;
+	uint vertSize;
+	uint vertCnt;
+	XVKVert* pData;
 
 public:
 	void InitData(const char* fileName);
 
-	void GetVertBuff(UINT* pBuff, UINT* length);
+	XVKVert* GetVertBuff();
 
-	uint32_t GetVertCount();
+	uint GetVertCount();
 
-	uint32_t GetVertSize();
+	uint GetVertSize();
 };
 

@@ -2,18 +2,39 @@
 #include "XVulkan.h"
 void XMesh::InitData(const char* fileName)
 {
-}
-void XMesh::GetVertBuff(UINT* pBuff, UINT* length)
-{
+	vertSize = sizeof(XVKVert);
 
+	pData[0] = {
+		1, 0, 0,
+		0, 0, 0,
+		1, 1
+	};
+
+	pData[1] = {
+		0, 1, 0,
+		0, 0, 0,
+		0.5, 0,
+	};
+
+	pData[2] = {
+		-1, 0, 0,
+		0, 0, 0,
+		1, 0,
+	};
+	
 }
 
-uint32_t XMesh::GetVertCount()
+XVKVert* XMesh::GetVertBuff()
 {
-	return uint32_t();
+	return pData;
 }
 
-uint32_t XMesh::GetVertSize()
+uint XMesh::GetVertCount()
 {
-	return sizeof(XVKVert);
+	return vertCnt;
+}
+
+uint XMesh::GetVertSize()
+{
+	return vertSize;
 }

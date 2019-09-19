@@ -27,6 +27,7 @@
     <ClCompile Include="XGame.cpp" />
     <ClCompile Include="XGameMgr.cpp" />
     <ClCompile Include="XGameObject.cpp" />
+    <ClCompile Include="XMesh.cpp" />
     <ClCompile Include="XModel.cpp" />
     <ClCompile Include="XObject.cpp" />
     <ClCompile Include="XObjectMgr.cpp" />
@@ -44,6 +45,7 @@
     <ClInclude Include="XGame.h" />
     <ClInclude Include="XGameMgr.h" />
     <ClInclude Include="XGameObject.h" />
+    <ClInclude Include="XMesh.h" />
     <ClInclude Include="XModel.h" />
     <ClInclude Include="XObject.h" />
     <ClInclude Include="XObjectMgr.h" />
