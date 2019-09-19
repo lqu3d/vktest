@@ -12,6 +12,8 @@ void XGame::Start()
 {
 	XGameObject* go = xobjMgr.AddObject<XGameObject>();
 	XCamera* cam = go->AddComponent<XCamera>();
+	cam = go->GetComponent<XCamera>();
+
 	//cam->gameObject.
 	auto trans = cam->gameObject->transform;
 	auto pos = trans->GetPosition();

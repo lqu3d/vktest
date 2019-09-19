@@ -5,7 +5,6 @@
 #pragma once
 #include<vector>
 #include<string>
-
 #include "XUtils.h"
 #include "XObject.h"
 #include "XTransform.h"
@@ -45,8 +44,20 @@ public:
 	template<typename T> T* GetComponent() {
 		for (size_t i = 0; i < objList->size(); i++)
 		{
-			if (XUtils::XSameType<T, decltype((*objList)[i])>())
-				return (T*)(*objList)[i];
+			/*** BUG 修复
+			* decltype得到的是变量的字面类型，并不能得到一个指针的实际类型
+			* 例：XComponent* pc = new XCamera(), decltype(pc) 得到 XComponent，而不是XCamera
+			* 使用dynamic_cast的问题是：可以使用基类来取来所有此基类的子类，这虽然不精确，但也有好处
+			* 类型u3d的 GetCompoent<Renderer>()就能取得所有渲染组件
+			*/
+			T* po = dynamic_cast<T*>((*objList)[i]);
+			if (po != NULL) {
+				return po;
+			}
+
+			//旧的方式实现有BUG，因为decltype反应的只是变量的字面类型，并不能反应出一个指针的实际类型，比如一个基类指针指向子类时
+			//if (XUtils::XSameType<T*, decltype((*objList)[i])>())
+			//	return (T*)(*objList)[i];
 		}
 
 		return NULL;
@@ -55,12 +66,20 @@ public:
 	template<typename T> void RemoveComponent() {
 		for (auto iter = objList->begin(); iter != objList->end(); ++iter)
 		{
-			if (XUtils::XSameType<T, decltype(*iter)>())
-			{
+			T* po = dynamic_cast<T*>((*objList)[i]);
+			if (po != NULL) {
 				X_OBJ_RELEASE(*iter);
 				objList->erase(iter);
 				break;
 			}
+
+			//旧的方式
+			//if (XUtils::XSameType<T, decltype(*iter)>())
+			//{
+			//	X_OBJ_RELEASE(*iter);
+			//	objList->erase(iter);
+			//	break;
+			//}
 		}
 	}
 	
