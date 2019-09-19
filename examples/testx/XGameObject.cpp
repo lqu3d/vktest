@@ -63,4 +63,14 @@ XGameObject::XGameObject(std::string name, XTransform* parent):transform(new XTr
 	transform->parent = parent;
 }
 
+void XGameObject::SetActive(bool active)
+{
+	isActive = active;
+}
+
+bool XGameObject::IsActive()
+{
+	return isActive;
+}
+
 

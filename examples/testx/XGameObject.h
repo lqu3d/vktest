@@ -16,7 +16,7 @@ class XGameObject :
 	friend class XObjectMgr;
 private:
 	std::vector<XComponent*>* objList = new std::vector<XComponent*>();
-
+	bool isActive;
 protected:
 	virtual void OnStart() override;
 
@@ -33,6 +33,9 @@ public:
 	std::string name;
 
 public:
+	void SetActive(bool active);
+	bool IsActive();
+
 	template<typename T> T* AddComponent() {
 		//显式赋值，用于检查T是不是XComponent的子类
 		XComponent* go = new T(this);
