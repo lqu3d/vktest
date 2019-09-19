@@ -354,6 +354,9 @@ void XVulkan::Setup()
 	InitCmdBuffer();
 
 	InitPipelineCache();
+
+	//创建【描述符对象池】，所有管线共用
+	CreateDescriptorPool(vkDescriptorPool);
 }
 
 /***
@@ -411,8 +414,19 @@ void XVulkan::FreeBuffer(XVkBuffer xvkBuffer)
 	
 }
 
+void XVulkan::CreateDescriptorSet(VkDescriptorSetLayout setLayout, VkDescriptorSet& descSet)
+{
+	VkDescriptorSetAllocateInfo descSetInfo = {};
+	descSetInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+	descSetInfo.descriptorPool = vkDescriptorPool;
+	descSetInfo.descriptorSetCount = 1;
+	descSetInfo.pSetLayouts = &setLayout;
+	auto ret = vkAllocateDescriptorSets(vkDevice, &descSetInfo, &descSet);
+	CheckResult(ret);
+}
+
 //创建一个只有VS,PS两个阶段的管线
-void XVulkan::CreatePiplineLayout(int vsDescriptorCnt, int psDescriptorCnt, VkPipelineLayout& pipLayout)
+void XVulkan::CreatePiplineLayout(int vsDescriptorCnt, int psDescriptorCnt, VkPipelineLayout& pipLayout, VkDescriptorSet& descSet)
 {
 	VkDescriptorSetLayoutBinding binding[2] = {};
 	binding[0].binding = 0;
@@ -430,25 +444,26 @@ void XVulkan::CreatePiplineLayout(int vsDescriptorCnt, int psDescriptorCnt, VkPi
 	layinfo.bindingCount = 2;
 	layinfo.pBindings = binding;
 
-	VkDescriptorSetLayout layout;
-	VkResult res = vkCreateDescriptorSetLayout(vkDevice, &layinfo, NULL, &layout);
+	//1，创建DescriptorSet Layout
+	VkDescriptorSetLayout descSetLayout;
+	VkResult res = vkCreateDescriptorSetLayout(vkDevice, &layinfo, NULL, &descSetLayout);
 	CheckResult(res);
 
+	//2，创建DescriptorSet
+	CreateDescriptorSet(descSetLayout, descSet);
+
+	//3，创建PipelineLayout
 	VkPipelineLayoutCreateInfo pipinfo = {};
 	pipinfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
 	pipinfo.setLayoutCount = 1;
-	pipinfo.pSetLayouts = &layout; //多套布局
-
-	/***
-	*一般我们只需要一个渲染管线，对应一种管线布局
-	* 但我们可以预先设置多套管理布局，在需要时进行切换，就像U3D的高清渲染管线和简单渲染管线
-	* 但是如何决定使用哪一种的？？？？
-	*/
+	pipinfo.pSetLayouts = &descSet; //多套布局
 	res = vkCreatePipelineLayout(vkDevice, &pipinfo, NULL, &pipLayout);
 	CheckResult(res);
+
 }
 
-void XVulkan::CreateDiffusePipeline(std::vector<UINT> vsCode, std::vector<UINT> psCode, VkPipeline& pipeline)
+//漫反射管线
+void XVulkan::CreateDiffusePipeline(std::vector<UINT> vsCode, std::vector<UINT> psCode, VkPipeline& pipeline, VkDescriptorSet& descSet)
 {
 	//顶点格式
 	VkVertexInputBindingDescription bindDesc = {};
@@ -466,66 +481,66 @@ void XVulkan::CreateDiffusePipeline(std::vector<UINT> vsCode, std::vector<UINT> 
 	}
 
 	//状态一，顶点输入
-	VkPipelineVertexInputStateCreateInfo vi = {};
-	vi.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-	vi.vertexBindingDescriptionCount = 1;
-	vi.pVertexBindingDescriptions = &bindDesc;
-	vi.vertexAttributeDescriptionCount = 3;
-	vi.pVertexAttributeDescriptions = attrDesc;
+	VkPipelineVertexInputStateCreateInfo vertexInfo = {};
+	vertexInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+	vertexInfo.vertexBindingDescriptionCount = 1;
+	vertexInfo.pVertexBindingDescriptions = &bindDesc;
+	vertexInfo.vertexAttributeDescriptionCount = 3;
+	vertexInfo.pVertexAttributeDescriptions = attrDesc;
 
 	//状态二，图元装配
-	VkPipelineInputAssemblyStateCreateInfo ai = {};
-	ai.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
-	ai.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+	VkPipelineInputAssemblyStateCreateInfo assemblyInfo = {};
+	assemblyInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
+	assemblyInfo.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
 
 	//状态三，光栅化
-	VkPipelineRasterizationStateCreateInfo ri = {};
-	ri.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
-	ri.polygonMode = VK_POLYGON_MODE_FILL;
-	ri.cullMode = VK_CULL_MODE_BACK_BIT;
-	ri.frontFace = VK_FRONT_FACE_CLOCKWISE;
-	ri.lineWidth = 1.0f;
+	VkPipelineRasterizationStateCreateInfo rasterInfo = {};
+	rasterInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
+	rasterInfo.polygonMode = VK_POLYGON_MODE_FILL;
+	rasterInfo.cullMode = VK_CULL_MODE_BACK_BIT;
+	rasterInfo.frontFace = VK_FRONT_FACE_CLOCKWISE;
+	rasterInfo.lineWidth = 1.0f;
 
 	//状态四，深度测试
-	VkPipelineDepthStencilStateCreateInfo dsi = {};
-	dsi.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
-	dsi.depthTestEnable = VK_TRUE;
-	dsi.depthWriteEnable = VK_TRUE;
-	dsi.depthCompareOp = VK_COMPARE_OP_LESS_OR_EQUAL;
+	VkPipelineDepthStencilStateCreateInfo depthStencilInfo = {};
+	depthStencilInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
+	depthStencilInfo.depthTestEnable = VK_TRUE;
+	depthStencilInfo.depthWriteEnable = VK_TRUE;
+	depthStencilInfo.depthCompareOp = VK_COMPARE_OP_LESS_OR_EQUAL;
 
 	//状态五，动态视口，窗口尺寸改变时就不必重新创建管线，这与设备丢失有关系吗？？
 	VkDynamicState dynamicStates[2] = {VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
-	VkPipelineDynamicStateCreateInfo dyi = {};
-	dyi.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
-	dyi.dynamicStateCount = 2;
-	dyi.pDynamicStates = dynamicStates;
+	VkPipelineDynamicStateCreateInfo dynamicInfo = {};
+	dynamicInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
+	dynamicInfo.dynamicStateCount = 2;
+	dynamicInfo.pDynamicStates = dynamicStates;
 
-	VkPipelineViewportStateCreateInfo vpi = {};
-	vpi.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
-	vpi.viewportCount = 1;
-	vpi.scissorCount = 1;
-	vpi.pViewports = NULL; //置为空，因为我们使用的是动态视口
-	vpi.pScissors = NULL; //置为空，因为我们使用的是动态视口
+	VkPipelineViewportStateCreateInfo viewportInfo = {};
+	viewportInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+	viewportInfo.viewportCount = 1;
+	viewportInfo.scissorCount = 1;
+	viewportInfo.pViewports = NULL; //置为空，因为我们使用的是动态视口
+	viewportInfo.pScissors = NULL; //置为空，因为我们使用的是动态视口
 
 	//创建管线
 	VkPipelineLayout pipLayout;
-	CreatePiplineLayout(1, 1, pipLayout);
+	CreatePiplineLayout(1, 1, pipLayout, descSet);
 
 	VkPipelineShaderStageCreateInfo stages[2];
 	CreateShaderStages(vsCode, psCode, stages);
 
 	VkGraphicsPipelineCreateInfo info = {};
 	info.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
-	info.layout = pipLayout; //todo: 专用化
-	info.pVertexInputState = &vi;
-	info.pInputAssemblyState = &ai;
-	info.pRasterizationState = &ri;
-	info.pDepthStencilState = &dsi;
+	info.layout = pipLayout;
+	info.pVertexInputState = &vertexInfo;
+	info.pInputAssemblyState = &assemblyInfo;
+	info.pRasterizationState = &rasterInfo;
+	info.pDepthStencilState = &depthStencilInfo;
 	info.renderPass = vkRenderPass;
 	info.stageCount = 2;
 	info.pStages = stages;
-	info.pDynamicState = &dyi;
-	info.pViewportState = &vpi;
+	info.pDynamicState = &dynamicInfo;
+	info.pViewportState = &viewportInfo;
 	
 	auto ret = vkCreateGraphicsPipelines(vkDevice, vkPipelineCache, 1, &info, NULL, &pipeline);
 	CheckResult(ret);
@@ -579,6 +594,32 @@ void XVulkan::AcquireNextImage(VkSwapchainKHR swapChain, UINT* imgIdx)
 	res = vkAcquireNextImageKHR(vkDevice, vkSwapchain, UINT64_MAX, imgAccSemaphore, NULL, imgIdx);
 	CheckResult(res);
 
+}
+
+void XVulkan::CreateDescriptorPool(VkDescriptorPool& pool)
+{
+	/***
+	* 描述符对象池的理解：一个DescriptorPool是一个map结构，key=DescriptorType, value=DescriptorCount
+	* 对象池为所有管线共用，一种材质对应一种管线，同时共存多种管线，因此对象池需要足够大
+	* uniform类型变量池暂定30个
+	* 纹理采样器变量池暂定8个，也就是同一shader 最多支持8张贴图
+	* todo: 其它类型变量池，按需扩增type_count数组大小
+	*/
+
+	VkDescriptorPoolSize type_count[2];
+	type_count[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	type_count[0].descriptorCount = 30;
+	type_count[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+	type_count[1].descriptorCount = 8;
+
+	VkDescriptorPoolCreateInfo poolInfo = {};
+	poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+	poolInfo.maxSets = 1;
+	poolInfo.poolSizeCount = 2;
+	poolInfo.pPoolSizes = type_count;
+
+	auto ret = vkCreateDescriptorPool(vkDevice, &poolInfo, NULL, &pool);
+	CheckResult(ret);
 }
 
 void XVulkan::InitRenderpass()

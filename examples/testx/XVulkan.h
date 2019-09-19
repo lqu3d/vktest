@@ -71,6 +71,7 @@ public:
 
 	VkPhysicalDeviceMemoryProperties vkPhyDevMemProps;
 
+	VkDescriptorPool vkDescriptorPool; //所有管线共用的【描述符对象池】
 
 	int vkQueueFamilyIdx;
 
@@ -93,18 +94,26 @@ private:
 	void InitSwapChain();
 	void InitDepthBuffer();
 
-
 	void InitRenderpass();
 
 	void InitFrameBuffers();
 
 	void InitPipelineCache(); //目前没什么用，空的流程
 
+
 #pragma region 工具函数
 
 	bool memory_type_from_properties(uint32_t typeBits, VkFlags requirements_mask, uint32_t* typeIndex);
 
 	void AcquireNextImage(VkSwapchainKHR swapChain, UINT* imgIdx);
+
+	void CreateDescriptorPool(VkDescriptorPool& pool);
+
+	void CreateDescriptorSet(VkDescriptorSetLayout setLayout, VkDescriptorSet& descSet);
+
+	void CreatePiplineLayout(int vsDescriptorCnt, int psDescriptorCnt, VkPipelineLayout& pipLayout, VkDescriptorSet& descSet);
+
+	void CreateShaderStages(std::vector<UINT> vsCode, std::vector<UINT> psCode, VkPipelineShaderStageCreateInfo* pStagesInfo);
 
 #pragma endregion
 
@@ -117,11 +126,7 @@ public:
 	void WriteBuffer(XVkBuffer xvkBuffer, void* pdata, UINT size, UINT offset);
 	void FreeBuffer(XVkBuffer xvkBuffer);
 
-	void CreatePiplineLayout(int vsDescriptorCnt, int psDescriptorCnt, VkPipelineLayout& pipLayout);
-
-	void CreateDiffusePipeline(std::vector<UINT> vsCode, std::vector<UINT> psCode, VkPipeline& pipeline); //漫反射效果渲染管线
-
-	void CreateShaderStages(std::vector<UINT> vsCode, std::vector<UINT> psCode, VkPipelineShaderStageCreateInfo* pStagesInfo);
+	void CreateDiffusePipeline(std::vector<UINT> vsCode, std::vector<UINT> psCode, VkPipeline& pipeline, VkDescriptorSet& descSet); 
 
 	void SetViewPort(int x, int y, int width, int height);
 
