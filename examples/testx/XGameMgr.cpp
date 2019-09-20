@@ -35,6 +35,8 @@ void XGameMgr::Loop()
 
 		xobjMgr.Update();
 		xgame.Update();
+
+		xrender.Update();
 	}
 }
 
@@ -44,10 +46,12 @@ void XGameMgr::Loop()
 void XGameMgr::Clear()
 {
 	xobjMgr.Clear();
+	xrender.Clear();
 }
 
 void XGameMgr::Destroy()
 {
 	xobjMgr.Destroy();
 	xgame.Destroy();
+	xrender.Destroy();
 }

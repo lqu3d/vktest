@@ -3,6 +3,7 @@
 #define X_OBJ_RELEASE(x){ if(x){ delete x; x = NULL;}}
 #define X_ARR_RELEASE(x){ if(x){delete[] x; x = NULL;}}
 
+#include <string>
 #include "glm/glm.hpp"
 #include "glm/ext.hpp"
 
@@ -10,6 +11,7 @@ namespace XUtils {
 
 	const float XEps = 0.000001f;
 
+	const std::string shaderRootPath = "shaders/";
 	bool XIsZero(float fx);
 
 	bool XIsZero(double fx);
