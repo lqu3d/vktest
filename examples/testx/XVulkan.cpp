@@ -432,21 +432,40 @@ void XVulkan::CreateDescriptorSet(VkDescriptorSetLayout setLayout, VkDescriptorS
 //创建一个只有VS,PS两个阶段的管线
 void XVulkan::CreatePiplineLayout(int vsDescriptorCnt, int psDescriptorCnt, VkPipelineLayout& pipLayout, VkDescriptorSet& descSet)
 {
-	VkDescriptorSetLayoutBinding binding[2] = {};
-	binding[0].binding = 0;
-	binding[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER; //uniform buffer
-	binding[0].stageFlags = VK_SHADER_STAGE_VERTEX_BIT; //vertext shader
-	binding[0].descriptorCount = vsDescriptorCnt; //vertext shader中的变量个数，现在我们只有一个mvp矩阵
+	/*** 对于 binding 的理解
+	* binding 起源于这里，代表shader的阶段，一般vs阶段binding指定0，ps阶段binding指定1
+	* 此后，在其它地方需要指定shader阶段时，就可以用binding指定
+	* 如下面的顶点格式，其中bindDesc.binding = 0，表示这个bindDesc是对vs阶段的描述
+	* attrDesc每一行的第二个参数0即binding=0，表示整个顶点属性是vs阶段的
+	*/
 
-	binding[1].binding = 1;
-	binding[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER; //图片采样器
-	binding[1].stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT; //pixel shader
-	binding[1].descriptorCount = psDescriptorCnt; //pixel shader中的变量个数，现在我们只有一个图片的sampler
+	//顶点格式
+	//VkVertexInputBindingDescription bindDesc = {};
+	//bindDesc.binding = 0;
+	//bindDesc.inputRate = VK_VERTEX_INPUT_RATE_VERTEX; //表示每个stride是一个顶点(XVKVert)的跨度
+	//bindDesc.stride = sizeof(XVKVert);
+
+	//VkVertexInputAttributeDescription attrDesc[3] = {
+	//	{0, 0, VK_FORMAT_R32G32B32_SFLOAT, 0}, //x,y,z
+	//	{1, 0, VK_FORMAT_R32G32B32_SFLOAT, 12}, //nx, ny, nz
+	//	{2, 0, VK_FORMAT_R32G32_SFLOAT, 24}, //u, v
+	//};
+
+	VkDescriptorSetLayoutBinding bindings[2] = {};
+	bindings[0].binding = 0;
+	bindings[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER; //uniform buffer
+	bindings[0].stageFlags = VK_SHADER_STAGE_VERTEX_BIT; //vertext shader
+	bindings[0].descriptorCount = vsDescriptorCnt; //vertext shader中的变量个数，现在我们只有一个mvp矩阵
+
+	bindings[1].binding = 1;
+	bindings[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER; //图片采样器
+	bindings[1].stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT; //pixel shader
+	bindings[1].descriptorCount = psDescriptorCnt; //pixel shader中的变量个数，现在我们只有一个图片的sampler
 
 	VkDescriptorSetLayoutCreateInfo layinfo = {};
 	layinfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
 	layinfo.bindingCount = 2;
-	layinfo.pBindings = binding;
+	layinfo.pBindings = bindings;
 
 	//1，创建DescriptorSet Layout
 	VkDescriptorSetLayout descSetLayout;
