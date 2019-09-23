@@ -33,7 +33,7 @@ struct XVKFrameBuffer {
 struct XVKVert {
 	float x, y, z;
 	float nx, ny, nz;
-	float u, v, w;
+	float u, v;
 };
 
 #pragma endregion

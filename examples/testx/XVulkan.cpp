@@ -472,17 +472,14 @@ void XVulkan::CreateDiffusePipeline(char* vsCode, uint vsLen, char* psCode, uint
 	//顶点格式
 	VkVertexInputBindingDescription bindDesc = {};
 	bindDesc.binding = 0;
-	bindDesc.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+	bindDesc.inputRate = VK_VERTEX_INPUT_RATE_VERTEX; //表示每个stride是一个顶点(XVKVert)的跨度
 	bindDesc.stride = sizeof(XVKVert);
 
-	VkVertexInputAttributeDescription attrDesc[3] = {};
-	for (size_t i = 0; i < 3; i++)
-	{
-		attrDesc[i].binding = 0;
-		attrDesc[i].format = VK_FORMAT_R32G32B32_SFLOAT;
-		attrDesc[i].location = i;
-		attrDesc[i].offset = 0;
-	}
+	VkVertexInputAttributeDescription attrDesc[3] = {
+		{0, 0, VK_FORMAT_R32G32B32_SFLOAT, 0}, //x,y,z
+		{1, 0, VK_FORMAT_R32G32B32_SFLOAT, 12}, //nx, ny, nz
+		{2, 0, VK_FORMAT_R32G32_SFLOAT, 24}, //u, v
+	};
 
 	//状态一，顶点输入
 	VkPipelineVertexInputStateCreateInfo vertexInfo = {};
