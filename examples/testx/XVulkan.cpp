@@ -463,7 +463,7 @@ void XVulkan::CreatePiplineLayout(int vsDescriptorCnt, int psDescriptorCnt, VkPi
 }
 
 //漫反射管线
-void XVulkan::CreateDiffusePipeline(std::vector<UINT> vsCode, std::vector<UINT> psCode, VkPipeline& pipeline, VkDescriptorSet& descSet)
+void XVulkan::CreateDiffusePipeline(char* vsCode, uint vsLen, char* psCode, uint psLen, VkPipeline& pipeline, VkDescriptorSet& descSet)
 {
 	//顶点格式
 	VkVertexInputBindingDescription bindDesc = {};
@@ -527,7 +527,7 @@ void XVulkan::CreateDiffusePipeline(std::vector<UINT> vsCode, std::vector<UINT> 
 	CreatePiplineLayout(1, 1, pipLayout, descSet);
 
 	VkPipelineShaderStageCreateInfo stages[2];
-	CreateShaderStages(vsCode, psCode, stages);
+	CreateShaderStages(vsCode,vsLen, psCode,psLen, stages);
 
 	VkGraphicsPipelineCreateInfo info = {};
 	info.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
@@ -548,9 +548,9 @@ void XVulkan::CreateDiffusePipeline(std::vector<UINT> vsCode, std::vector<UINT> 
 }
 
 //创建vs,ps模块
-void XVulkan::CreateShaderStages(std::vector<UINT> vsCode, std::vector<UINT> psCode,VkPipelineShaderStageCreateInfo* pStagesInfo)
+void XVulkan::CreateShaderStages(char* vsCode, uint vsLen, char* psCode, uint psLen, VkPipelineShaderStageCreateInfo* pStagesInfo)
 {
-	if (vsCode.size() == 0 || psCode.size() == 0) {
+	if (vsLen == 0 || psLen == 0) {
 		printf("InitShader失败");
 		return;
 	}
@@ -561,13 +561,13 @@ void XVulkan::CreateShaderStages(std::vector<UINT> vsCode, std::vector<UINT> psC
 	VkShaderModuleCreateInfo minfo = {};
 	minfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
 
-	minfo.codeSize = vsCode.size() * isize;
-	minfo.pCode = vsCode.data();
+	minfo.codeSize = vsLen;
+	minfo.pCode = (uint*)vsCode;
 	auto ret = vkCreateShaderModule(vkDevice, &minfo, NULL, &vsModule);
 	CheckResult(ret);
 
-	minfo.codeSize = psCode.size() * isize;
-	minfo.pCode = psCode.data();
+	minfo.codeSize = psLen;
+	minfo.pCode = (uint*)psCode;
 	ret = vkCreateShaderModule(vkDevice, &minfo, NULL, &psModule);
 	CheckResult(ret);
 

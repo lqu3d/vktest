@@ -3,8 +3,10 @@
 class XMaterial :
 	public XComponent
 {
-	friend class XObjectMgr;
+	friend class XGameObject;
 	XMaterial(XGameObject* gameObject);
+
+private:
 
 	std::string vsFilename;
 	std::string psFilename;

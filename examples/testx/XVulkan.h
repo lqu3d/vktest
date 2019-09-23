@@ -10,6 +10,8 @@
 #include "XWindow.h"
 
 #pragma region struct
+typedef unsigned int uint;
+
 struct XVkImage {
 	VkFormat format;
 	VkImage image;
@@ -35,6 +37,7 @@ struct XVKVert {
 };
 
 #pragma endregion
+
 
 class XVulkan
 {
@@ -113,7 +116,7 @@ private:
 
 	void CreatePiplineLayout(int vsDescriptorCnt, int psDescriptorCnt, VkPipelineLayout& pipLayout, VkDescriptorSet& descSet);
 
-	void CreateShaderStages(std::vector<UINT> vsCode, std::vector<UINT> psCode, VkPipelineShaderStageCreateInfo* pStagesInfo);
+	void CreateShaderStages(char* vsCode, uint vsLen, char* psCode, uint psLen, VkPipelineShaderStageCreateInfo* pStagesInfo);
 
 #pragma endregion
 
@@ -126,7 +129,7 @@ public:
 	void WriteBuffer(XVkBuffer xvkBuffer, void* pdata, UINT size, UINT offset);
 	void FreeBuffer(XVkBuffer xvkBuffer);
 
-	void CreateDiffusePipeline(std::vector<UINT> vsCode, std::vector<UINT> psCode, VkPipeline& pipeline, VkDescriptorSet& descSet); 
+	void CreateDiffusePipeline(char* vsCode, uint vsLen, char* psCode, uint psLen, VkPipeline& pipeline, VkDescriptorSet& descSet); 
 
 	void SetViewPort(int x, int y, int width, int height);
 

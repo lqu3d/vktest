@@ -3,6 +3,9 @@
 class XCamera :
 	public XComponent
 {
+	friend class XGameObject;
+	XCamera(XGameObject* gameObject);
+
 private:
 	glm::mat4 __tmProj; //¡¾Âã±äÁ¿¡¿
 	bool isProjChged = false;
@@ -14,7 +17,6 @@ private:
 	float height = 100;
 
 public:
-	XCamera(XGameObject* gameObject);
 
 	void SetFov(float fov);
 	float GetFov();

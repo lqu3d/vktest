@@ -7,12 +7,18 @@
 #include <glm/ext.hpp>
 #include "XTransform.h"
 #include "GLMTest.h"
+#include "XMaterial.h"
 
 void XGame::Start()
 {
 	XGameObject* go = xobjMgr.AddObject<XGameObject>();
 	XCamera* cam = go->AddComponent<XCamera>();
 	cam = go->GetComponent<XCamera>();
+
+	auto mat = go->AddComponent<XMaterial>();
+	
+	mat->SetShaderVs("diffuse.vert.spv");
+	mat->SetShaderPs("diffuse.frag.spv");
 
 	//cam->gameObject.
 	auto trans = cam->gameObject->transform;
