@@ -460,7 +460,7 @@ void XVulkan::CreatePiplineLayout(int vsDescriptorCnt, int psDescriptorCnt, VkPi
 	VkPipelineLayoutCreateInfo pipinfo = {};
 	pipinfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
 	pipinfo.setLayoutCount = 1;
-	pipinfo.pSetLayouts = &descSet; //多套布局
+	pipinfo.pSetLayouts = &descSetLayout; //多套布局
 	res = vkCreatePipelineLayout(vkDevice, &pipinfo, NULL, &pipLayout);
 	CheckResult(res);
 
