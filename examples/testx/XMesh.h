@@ -9,6 +9,10 @@ class XMesh :
 	uint vertSize;
 	uint vertCnt;
 	XVKVert* pData;
+public:
+	virtual void OnStart() override;
+
+	virtual void OnDestroy() override;
 
 public:
 	void InitData(const char* fileName);

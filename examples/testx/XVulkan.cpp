@@ -353,6 +353,10 @@ void XVulkan::Setup()
 
 	InitCmdBuffer();
 
+	InitRenderpass();
+
+	InitFrameBuffers();
+
 	InitPipelineCache();
 
 	//创建【描述符对象池】，所有管线共用
@@ -622,6 +626,7 @@ void XVulkan::CreateDescriptorPool(VkDescriptorPool& pool)
 	CheckResult(ret);
 }
 
+//通用的renderpass ，暂时的，用于所有管线
 void XVulkan::InitRenderpass()
 {
 	bool clear = true;
@@ -714,10 +719,13 @@ void XVulkan::InitFrameBuffers()
 
 		viewInfo.image = images[i];
 		ret = vkCreateImageView(vkDevice, &viewInfo, NULL, &xvkFrameBuffers[i].view); //view
+		CheckResult(ret);
 
 		attachments[0] = xvkFrameBuffers[i].view;
 		attachments[1] = vkDepth.view;
 		ret = vkCreateFramebuffer(vkDevice, &fbInfo, NULL, &xvkFrameBuffers[i].frameBuffer); //frameBuffer
+		CheckResult(ret);
+
 	}
 }
 
