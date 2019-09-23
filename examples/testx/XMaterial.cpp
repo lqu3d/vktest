@@ -1,4 +1,6 @@
 #include <fstream>
+#include <sstream>
+
 #include "XMaterial.h"
 #include "XRender.h"
 
@@ -6,6 +8,29 @@ XMaterial::XMaterial(XGameObject* gameObject):XComponent(gameObject)
 {
 	//按材质分类，添加到render中
 	xrender.AddGameObject(gameObject);
+
+}
+
+void XMaterial::LoadShader(const char* file, char** ppCode, uint* pLen)
+{
+	X_OBJ_RELEASE(*ppCode);
+
+	std::string path = XUtils::shaderRootPath + file;
+
+	std::fstream fs;
+	fs.open(path, std::ios::in);
+	if (!fs) {
+		return;
+	}
+
+	//获取文件字节数
+	fs.seekg(0, std::ios::end);
+	*pLen = fs.tellg();
+	fs.seekg(0, std::ios::beg);
+
+	uint len = *pLen;
+	*ppCode = new char[len];
+	fs.read(*ppCode, len);
 
 }
 
@@ -26,53 +51,38 @@ void XMaterial::OnDestroy()
 void XMaterial::SetShaderVs(const char* file)
 {
 	if (vsFilename == file) return;
-
 	vsFilename = file;
-	std::string path = XUtils::shaderRootPath + file;
-
-	std::fstream fs;
-	fs.open(path, std::ios::in);
-	if (!fs) {
-		return;
-	}
-
+	
+	LoadShader(file, &pVsCode, &vsCodeLength);
 	
 }
 
 void XMaterial::SetShaderPs(const char* file)
 {
 	if (psFilename == file) return;
-
 	psFilename = file;
-	std::string path = XUtils::shaderRootPath + file;
 
-	std::fstream fs;
-	fs.open(path, std::ios::in);
-	if (!fs) {
-		return;
-	}
-
-
+	LoadShader(file, &pPsCode, &psCodeLength);
 }
 
 uint* XMaterial::GetVsShaderSpirv()
 {
-	return vsCode.data();
+	return (uint*)pVsCode;
 }
 
 uint XMaterial::GetVsShaderSpirvLength()
 {
-	return vsCode.size();
+	return vsCodeLength;
 }
 
 uint* XMaterial::GetPsShaderSpirv()
 {
-	return psCode.data();
+	return (uint*)pPsCode;
 }
 
 uint XMaterial::GetPsShaderSpirvLength()
 {
-	return psCode.size();
+	return psCodeLength;
 }
 
 

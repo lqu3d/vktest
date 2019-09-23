@@ -9,8 +9,12 @@ class XMaterial :
 	std::string vsFilename;
 	std::string psFilename;
 
-	std::vector<uint> psCode;
-	std::vector<uint> vsCode;
+	char* pVsCode = NULL;
+	uint vsCodeLength;
+	char* pPsCode = NULL;
+	uint psCodeLength;
+private:
+	void LoadShader(const char* file, char** ppCode, uint* pLen);
 public:
 
 	virtual void OnStart() override;
