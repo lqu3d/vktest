@@ -20,15 +20,14 @@ void XGame::Start()
 	mat->SetShaderVs("diffuse.vert.spv");
 	mat->SetShaderPs("diffuse.frag.spv");
 
-	//cam->gameObject.
 	auto trans = cam->gameObject->transform;
 	auto pos = trans->GetPosition();
 	trans->SetPos(glm::vec3(0, 1, 0));
 	cam->SetNearPlane(1.0f);
 	cam->SetFarPlane(1000.0f);
 	cam->SetFov(45);
-	//GLMTest glmtest;
-	//glmtest.Test();
+	GLMTest glmtest;
+	glmtest.Test();
 
 
 

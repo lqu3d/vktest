@@ -5,21 +5,18 @@
 
 void XGameObject::RemoveAllComponents()
 {
-	for (size_t i = 0; i < objList->size(); i++)
-	{
-		auto obj = (*objList)[i];
-		obj->OnDestroy();
+	//遍历中移除
+	for (auto iter = objList.begin(); iter != objList.end();) {
+		(*iter)->OnDestroy();
+		X_OBJ_RELEASE(*iter);
 
-		X_OBJ_RELEASE(obj);
+		iter = objList.erase(iter);
 	}
-
-	objList->clear();
-	
 }
 
 void XGameObject::OnStart()
 {
-	auto list = *objList;
+	auto list = objList;
 	for each (auto var in list)
 	{
 		var->OnStart();
@@ -29,7 +26,7 @@ void XGameObject::OnStart()
 
 void XGameObject::OnUpdate()
 {
-	auto list = *objList;
+	auto list = objList;
 	for each (auto var in list)
 	{
 		var->OnUpdate();
@@ -47,7 +44,7 @@ void XGameObject::OnDestroy()
 	RemoveAllComponents();
 
 	//step2
-	X_OBJ_RELEASE(objList);
+	//X_OBJ_RELEASE(objList);
 }
 
 /*** 参数使用std::string而不是char*或const char* 的原理

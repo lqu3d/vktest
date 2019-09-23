@@ -6,6 +6,10 @@ XComponent::XComponent(XGameObject* gameObject)
 	
 }
 
+XComponent::~XComponent()
+{
+}
+
 void XComponent::OnStart()
 {
 }

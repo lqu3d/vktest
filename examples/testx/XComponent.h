@@ -6,8 +6,9 @@ class XComponent :
 	public XObject
 {
 	friend class XGameObject;
-public:
+protected:
 	XComponent(XGameObject* gameObject);
+	virtual ~XComponent();
 public:
 	XGameObject* const gameObject; //指针不可更改，仅在构造函数的列表中确定其值
 	XTransform* const transform;

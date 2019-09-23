@@ -15,7 +15,7 @@ class XGameObject :
 {
 	friend class XObjectMgr;
 private:
-	std::vector<XComponent*>* objList = new std::vector<XComponent*>();
+	std::vector<XComponent*> objList;
 	bool isActive;
 protected:
 	virtual void OnStart() override;
@@ -41,12 +41,12 @@ public:
 		XComponent* go = new T(this);
 		go->OnStart();
 
-		objList->push_back(go);
+		objList.push_back(go);
 		return (T*)go;
 	}
 	
 	template<typename T> T* GetComponent() {
-		for (size_t i = 0; i < objList->size(); i++)
+		for (size_t i = 0; i < objList.size(); i++)
 		{
 			/*** BUG 修复
 			* decltype得到的是变量的字面类型，并不能得到一个指针的实际类型
@@ -54,7 +54,7 @@ public:
 			* 使用dynamic_cast的问题是：可以使用基类来取来所有此基类的子类，这虽然不精确，但也有好处
 			* 类型u3d的 GetCompoent<Renderer>()就能取得所有渲染组件
 			*/
-			T* po = dynamic_cast<T*>((*objList)[i]);
+			T* po = dynamic_cast<T*>(objList[i]);
 			if (po != NULL) {
 				return po;
 			}
@@ -68,40 +68,30 @@ public:
 	}
 	
 	template<typename T> void RemoveComponent() {
-		for (auto iter = objList->begin(); iter != objList->end(); ++iter)
+		for (auto iter = objList.begin(); iter != objList.end(); ++iter)
 		{
-			T* po = dynamic_cast<T*>((*objList)[i]);
+			T* po = dynamic_cast<T*>(*iter);
 			if (po != NULL) {
 				po->OnDestroy();
 
 				X_OBJ_RELEASE(*iter);
-				objList->erase(iter);
+				objList.erase(iter);
 				break;
 			}
-
-			//旧的方式
-			//if (XUtils::XSameType<T, decltype(*iter)>())
-			//{
-			//	X_OBJ_RELEASE(*iter);
-			//	objList->erase(iter);
-			//	break;
-			//}
 		}
 	}
 	
 	template<typename T> void RemoveAllComponents() {
-		std::vector<XGameObject*> vec;
-		for (auto iter = objList->begin(); iter != objList->end(); ++iter)
-		{
-			if (XSameType<T, decltype(*iter)>())
-			{
-				vec.push_back(*iter);
-			}
-		}
+		//遍历中移除
+		for (auto iter = objList.begin(); iter != objList.end();) {
+			T* po = dynamic_cast<T*>(*iter);
+			if (!po) iter++;
 
-		for (auto iter = vec.begin(); iter != vec.end(); ++iter) {
+			(*iter)->OnDestroy();
 			X_OBJ_RELEASE(*iter);
-			objList->erase(iter);
+
+			iter = objList.erase(iter);
+
 		}
 	}
 
