@@ -432,35 +432,20 @@ void XVulkan::CreateDescriptorSet(VkDescriptorSetLayout setLayout, VkDescriptorS
 //创建一个只有VS,PS两个阶段的管线
 void XVulkan::CreatePiplineLayout(int vsDescriptorCnt, int psDescriptorCnt, VkPipelineLayout& pipLayout, VkDescriptorSet& descSet)
 {
-	/*** 对于 binding 的理解
-	* binding 起源于这里，代表shader的阶段，一般vs阶段binding指定0，ps阶段binding指定1
-	* 此后，在其它地方需要指定shader阶段时，就可以用binding指定
-	* 如下面的顶点格式，其中bindDesc.binding = 0，表示这个bindDesc是对vs阶段的描述
-	* attrDesc每一行的第二个参数0即binding=0，表示整个顶点属性是vs阶段的
+	/*** descriptorCount 的说明
+	* 如果不为1，则bind的是一个数组，例如：
+	* layout (set=M, binding=N) uniform sampler2D variableNameArray[I];
 	*/
-
-	//顶点格式
-	//VkVertexInputBindingDescription bindDesc = {};
-	//bindDesc.binding = 0;
-	//bindDesc.inputRate = VK_VERTEX_INPUT_RATE_VERTEX; //表示每个stride是一个顶点(XVKVert)的跨度
-	//bindDesc.stride = sizeof(XVKVert);
-
-	//VkVertexInputAttributeDescription attrDesc[3] = {
-	//	{0, 0, VK_FORMAT_R32G32B32_SFLOAT, 0}, //x,y,z
-	//	{1, 0, VK_FORMAT_R32G32B32_SFLOAT, 12}, //nx, ny, nz
-	//	{2, 0, VK_FORMAT_R32G32_SFLOAT, 24}, //u, v
-	//};
-
 	VkDescriptorSetLayoutBinding bindings[2] = {};
-	bindings[0].binding = 0;
+	bindings[0].binding = 0; //对应shader中的binding = 0
 	bindings[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER; //uniform buffer
 	bindings[0].stageFlags = VK_SHADER_STAGE_VERTEX_BIT; //vertext shader
-	bindings[0].descriptorCount = vsDescriptorCnt; //vertext shader中的变量个数，现在我们只有一个mvp矩阵
+	bindings[0].descriptorCount = vsDescriptorCnt; //不为1则对应一个数组
 
-	bindings[1].binding = 1;
+	bindings[1].binding = 1;//对应shader中的binding = 1
 	bindings[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER; //图片采样器
 	bindings[1].stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT; //pixel shader
-	bindings[1].descriptorCount = psDescriptorCnt; //pixel shader中的变量个数，现在我们只有一个图片的sampler
+	bindings[1].descriptorCount = psDescriptorCnt; //不为1则对应一个数组
 
 	VkDescriptorSetLayoutCreateInfo layinfo = {};
 	layinfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
@@ -479,7 +464,7 @@ void XVulkan::CreatePiplineLayout(int vsDescriptorCnt, int psDescriptorCnt, VkPi
 	VkPipelineLayoutCreateInfo pipinfo = {};
 	pipinfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
 	pipinfo.setLayoutCount = 1;
-	pipinfo.pSetLayouts = &descSetLayout; //多套布局
+	pipinfo.pSetLayouts = &descSetLayout; //多套布局，在shader中用 layout(set=m,binding=n)来指定
 	res = vkCreatePipelineLayout(vkDevice, &pipinfo, NULL, &pipLayout);
 	CheckResult(res);
 
@@ -488,6 +473,11 @@ void XVulkan::CreatePiplineLayout(int vsDescriptorCnt, int psDescriptorCnt, VkPi
 //漫反射管线
 void XVulkan::CreateDiffusePipeline(char* vsCode, uint vsLen, char* psCode, uint psLen, VkPipeline& pipeline, VkDescriptorSet& descSet)
 {
+	/*** 关于binding
+	* 顶点格式可以事先声明多套，在使用vkCmdBindVertexBuffer(cmdbuff, firstbinding, bindingcount,pbuffers, offsets)时指定使用哪一套或多套
+	* 这与 descriptor set layout中的binding在shader中指定有所不同
+	*/
+
 	//顶点格式
 	VkVertexInputBindingDescription bindDesc = {};
 	bindDesc.binding = 0;
@@ -495,6 +485,7 @@ void XVulkan::CreateDiffusePipeline(char* vsCode, uint vsLen, char* psCode, uint
 	bindDesc.stride = sizeof(XVKVert);
 
 	VkVertexInputAttributeDescription attrDesc[3] = {
+		/*{location, binding, format, offset}*/
 		{0, 0, VK_FORMAT_R32G32B32_SFLOAT, 0}, //x,y,z
 		{1, 0, VK_FORMAT_R32G32B32_SFLOAT, 12}, //nx, ny, nz
 		{2, 0, VK_FORMAT_R32G32_SFLOAT, 24}, //u, v
