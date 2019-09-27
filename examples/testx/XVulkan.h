@@ -36,6 +36,14 @@ struct XVKVert {
 	float u, v;
 };
 
+struct XVKDescriptorSet {
+	VkDescriptorSet descSet;
+	VkDescriptorSetLayoutCreateInfo info;
+	VkWriteDescriptorSet* writes = NULL;
+
+	void UpdateDescriptorSet();
+};
+
 #pragma endregion
 
 
@@ -114,7 +122,7 @@ private:
 
 	void CreateDescriptorSet(VkDescriptorSetLayout setLayout, VkDescriptorSet& descSet);
 
-	void CreatePiplineLayout(int vsDescriptorCnt, int psDescriptorCnt, VkPipelineLayout& pipLayout, VkDescriptorSet& descSet);
+	void CreatePiplineLayout(int vsDescriptorCnt, int psDescriptorCnt, VkPipelineLayout& pipLayout, XVKDescriptorSet& xvkDescriptorSet);
 
 	void CreateShaderStages(char* vsCode, uint vsLen, char* psCode, uint psLen, VkPipelineShaderStageCreateInfo* pStagesInfo);
 
@@ -129,7 +137,7 @@ public:
 	void WriteBuffer(XVkBuffer xvkBuffer, void* pdata, UINT size, UINT offset);
 	void FreeBuffer(XVkBuffer xvkBuffer);
 
-	void CreateDiffusePipeline(char* vsCode, uint vsLen, char* psCode, uint psLen, VkPipeline& pipeline, VkDescriptorSet& descSet); 
+	void CreateDiffusePipeline(char* vsCode, uint vsLen, char* psCode, uint psLen, VkPipeline& pipeline, XVKDescriptorSet& xvkDescriptorSet);
 
 	void SetViewPort(int x, int y, int width, int height);
 

@@ -430,35 +430,41 @@ void XVulkan::CreateDescriptorSet(VkDescriptorSetLayout setLayout, VkDescriptorS
 }
 
 //创建一个只有VS,PS两个阶段的管线
-void XVulkan::CreatePiplineLayout(int vsDescriptorCnt, int psDescriptorCnt, VkPipelineLayout& pipLayout, VkDescriptorSet& descSet)
+void XVulkan::CreatePiplineLayout(int vsDescriptorCnt, int psDescriptorCnt, VkPipelineLayout& pipLayout, XVKDescriptorSet& xvkDescriptorSet)
 {
 	/*** descriptorCount 的说明
 	* 如果不为1，则bind的是一个数组，例如：
 	* layout (set=M, binding=N) uniform sampler2D variableNameArray[I];
 	*/
-	VkDescriptorSetLayoutBinding bindings[2] = {};
+	auto bindings = new VkDescriptorSetLayoutBinding[2];
+	bindings[0] = {};
 	bindings[0].binding = 0; //对应shader中的binding = 0
 	bindings[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER; //uniform buffer
 	bindings[0].stageFlags = VK_SHADER_STAGE_VERTEX_BIT; //vertext shader
 	bindings[0].descriptorCount = vsDescriptorCnt; //不为1则对应一个数组
 
+	bindings[1] = {};
 	bindings[1].binding = 1;//对应shader中的binding = 1
 	bindings[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER; //图片采样器
 	bindings[1].stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT; //pixel shader
 	bindings[1].descriptorCount = psDescriptorCnt; //不为1则对应一个数组
 
-	VkDescriptorSetLayoutCreateInfo layinfo = {};
-	layinfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-	layinfo.bindingCount = 2;
-	layinfo.pBindings = bindings;
+	//VkDescriptorSetLayoutCreateInfo layinfo = {};
+	//layinfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+	//layinfo.bindingCount = 2;
+	//layinfo.pBindings = bindings;
+	xvkDescriptorSet.info = {};
+	xvkDescriptorSet.info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+	xvkDescriptorSet.info.bindingCount = 2;
+	xvkDescriptorSet.info.pBindings = bindings;
 
 	//1，创建DescriptorSet Layout
 	VkDescriptorSetLayout descSetLayout;
-	VkResult res = vkCreateDescriptorSetLayout(vkDevice, &layinfo, NULL, &descSetLayout);
+	VkResult res = vkCreateDescriptorSetLayout(vkDevice, &(xvkDescriptorSet.info), NULL, &descSetLayout);
 	CheckResult(res);
 
 	//2，创建DescriptorSet
-	CreateDescriptorSet(descSetLayout, descSet);
+	CreateDescriptorSet(descSetLayout, xvkDescriptorSet.descSet);
 
 	//3，创建PipelineLayout
 	VkPipelineLayoutCreateInfo pipinfo = {};
@@ -471,7 +477,7 @@ void XVulkan::CreatePiplineLayout(int vsDescriptorCnt, int psDescriptorCnt, VkPi
 }
 
 //漫反射管线
-void XVulkan::CreateDiffusePipeline(char* vsCode, uint vsLen, char* psCode, uint psLen, VkPipeline& pipeline, VkDescriptorSet& descSet)
+void XVulkan::CreateDiffusePipeline(char* vsCode, uint vsLen, char* psCode, uint psLen, VkPipeline& pipeline, XVKDescriptorSet& xvkDescriptorSet)
 {
 	/*** 关于binding
 	* 顶点格式可以事先声明多套，在使用vkCmdBindVertexBuffer(cmdbuff, firstbinding, bindingcount,pbuffers, offsets)时指定使用哪一套或多套
@@ -535,7 +541,7 @@ void XVulkan::CreateDiffusePipeline(char* vsCode, uint vsLen, char* psCode, uint
 
 	//创建管线
 	VkPipelineLayout pipLayout;
-	CreatePiplineLayout(1, 1, pipLayout, descSet);
+	CreatePiplineLayout(1, 1, pipLayout, xvkDescriptorSet);
 
 	VkPipelineShaderStageCreateInfo stages[2];
 	CreateShaderStages(vsCode,vsLen, psCode,psLen, stages);
@@ -807,4 +813,33 @@ void XVulkan::CheckResult(VkResult err)
 	printf("VKResult : %d", err);
 
 	abort();
+}
+
+void XVKDescriptorSet::UpdateDescriptorSet()
+{
+	if (!writes) {
+		writes = new VkWriteDescriptorSet[info.bindingCount];
+
+	}
+
+	for (size_t i = 0; i < info.bindingCount; i++)
+	{
+		auto layoutBinding = info.pBindings[i];
+		writes[i] = {};
+		writes[i].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		writes[i].dstSet = descSet;
+		writes[i].dstBinding = layoutBinding.binding;
+		writes[i].descriptorType = layoutBinding.descriptorType;
+		writes[i].descriptorCount = layoutBinding.descriptorCount; //如果不为1则对应数组
+		writes[i].dstArrayElement = 0; //从数组的第一个元素开始写，非数组类型可视为只有一个元素的数组
+
+		if (layoutBinding.descriptorType == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER) {
+			//writes[i].pBufferInfo = 
+		}
+		else if (layoutBinding.descriptorType == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER) {//todo 类型判断不严谨，需完善
+
+		}
+	}
+
+
 }
