@@ -63,7 +63,7 @@ private:
 
 };
 
-struct XVKBasePipeline {
+struct XVKPipelineBase {
 	VkPipeline pipeline;
 	
 	XVKDescriptorSetBase xvkDescSet;
@@ -146,7 +146,7 @@ private:
 
 	void CreateDescriptorSet(VkDescriptorSetLayout setLayout, VkDescriptorSet& descSet);
 
-	void CreatePiplineLayout(int vsDescriptorCnt, int psDescriptorCnt, VkPipelineLayout& pipLayout, XVKDescriptorSetBase& xvkDescriptorSet);
+	void CreatePiplineLayout(VkPipelineLayout& pipLayout, XVKDescriptorSetBase& xvkDescriptorSet);
 
 	void CreateShaderStages(char* vsCode, uint vsLen, char* psCode, uint psLen, VkPipelineShaderStageCreateInfo* pStagesInfo);
 
@@ -163,7 +163,7 @@ public:
 
 	void LoadXImage(const char* file, XVkImage& image);
 
-	void CreateDiffusePipeline(char* vsCode, uint vsLen, char* psCode, uint psLen, VkPipeline& pipeline, XVKDescriptorSetBase& xvkDescriptorSet);
+	void CreateDiffusePipeline(char* vsCode, uint vsLen, char* psCode, uint psLen, XVKPipelineBase& pipelineBase);
 
 	void SetViewPort(int x, int y, int width, int height);
 

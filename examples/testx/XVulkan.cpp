@@ -434,7 +434,7 @@ void XVulkan::CreateDescriptorSet(VkDescriptorSetLayout setLayout, VkDescriptorS
 }
 
 //创建一个只有VS,PS两个阶段的管线
-void XVulkan::CreatePiplineLayout(int vsDescriptorCnt, int psDescriptorCnt, VkPipelineLayout& pipLayout, XVKDescriptorSetBase& xvkDescriptorSet)
+void XVulkan::CreatePiplineLayout(VkPipelineLayout& pipLayout, XVKDescriptorSetBase& xvkDescriptorSet)
 {
 	/*** descriptorCount 的说明
 	* 如果不为1，则bind的是一个数组，例如：
@@ -445,13 +445,13 @@ void XVulkan::CreatePiplineLayout(int vsDescriptorCnt, int psDescriptorCnt, VkPi
 	bindings[0].binding = 0; //对应shader中的binding = 0
 	bindings[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER; //uniform buffer
 	bindings[0].stageFlags = VK_SHADER_STAGE_VERTEX_BIT; //vertext shader
-	bindings[0].descriptorCount = vsDescriptorCnt; //不为1则对应一个数组
+	bindings[0].descriptorCount = 1; //不为1则对应一个数组
 
 	bindings[1] = {};
 	bindings[1].binding = 1;//对应shader中的binding = 1
 	bindings[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER; //图片采样器
 	bindings[1].stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT; //pixel shader
-	bindings[1].descriptorCount = psDescriptorCnt; //不为1则对应一个数组
+	bindings[1].descriptorCount = 1; //不为1则对应一个数组
 
 	//VkDescriptorSetLayoutCreateInfo layinfo = {};
 	//layinfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
@@ -481,7 +481,7 @@ void XVulkan::CreatePiplineLayout(int vsDescriptorCnt, int psDescriptorCnt, VkPi
 }
 
 //漫反射管线
-void XVulkan::CreateDiffusePipeline(char* vsCode, uint vsLen, char* psCode, uint psLen, VkPipeline& pipeline, XVKDescriptorSetBase& xvkDescriptorSet)
+void XVulkan::CreateDiffusePipeline(char* vsCode, uint vsLen, char* psCode, uint psLen, XVKPipelineBase& pipelineBase)
 {
 	/*** 关于binding
 	* 顶点格式可以事先声明多套，在使用vkCmdBindVertexBuffer(cmdbuff, firstbinding, bindingcount,pbuffers, offsets)时指定使用哪一套或多套
@@ -545,7 +545,7 @@ void XVulkan::CreateDiffusePipeline(char* vsCode, uint vsLen, char* psCode, uint
 
 	//创建管线
 	VkPipelineLayout pipLayout;
-	CreatePiplineLayout(1, 1, pipLayout, xvkDescriptorSet);
+	CreatePiplineLayout(pipLayout, pipelineBase.xvkDescSet);
 
 	VkPipelineShaderStageCreateInfo stages[2];
 	CreateShaderStages(vsCode,vsLen, psCode,psLen, stages);
@@ -563,7 +563,7 @@ void XVulkan::CreateDiffusePipeline(char* vsCode, uint vsLen, char* psCode, uint
 	info.pDynamicState = &dynamicInfo;
 	info.pViewportState = &viewportInfo;
 	
-	auto ret = vkCreateGraphicsPipelines(vkDevice, vkPipelineCache, 1, &info, NULL, &pipeline);
+	auto ret = vkCreateGraphicsPipelines(vkDevice, vkPipelineCache, 1, &info, NULL, &pipelineBase.pipeline);
 	CheckResult(ret);
 
 }
