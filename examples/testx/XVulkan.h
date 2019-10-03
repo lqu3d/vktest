@@ -151,6 +151,11 @@ private:
 	void CreateShaderStages(char* vsCode, uint vsLen, char* psCode, uint psLen, VkPipelineShaderStageCreateInfo* pStagesInfo);
 
 	bool IsDepthFormat(VkFormat fmt);
+
+	VkCommandBuffer BeginSingleTimeCmdBuffer();
+
+	void EndSingleTimeCmdBuffer(VkCommandBuffer cmdBuffer);
+
 #pragma endregion
 
 
@@ -163,6 +168,11 @@ public:
 	void FreeBuffer(XVkBuffer xvkBuffer);
 
 	bool CreateImage(uint w, uint h, VkFormat fmt, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags props, XVkImage& img);
+	void TransImageLayout(VkImage image, VkFormat fmt, VkImageLayout oldLayout, VkImageLayout newLayout);
+
+	void CopyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);	
+	void CopyBufferToImage(VkBuffer buffer, VkImage image, uint width, uint height);
+
 
 	void CreateDiffusePipeline(char* vsCode, uint vsLen, char* psCode, uint psLen, XVKPipelineBase& pipelineBase);
 
