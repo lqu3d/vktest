@@ -5,7 +5,7 @@
 
 #include<vulkan/vulkan.h>	
 #include <vector>
-//#include <glm/glm.hpp>
+#include <glm/glm.hpp>
 
 #include "XWindow.h"
 
@@ -20,8 +20,11 @@ struct XVkImage {
 };
 
 struct XVkBuffer {
-	VkDescriptorBufferInfo info;
+	VkBuffer buffer;
+	VkDeviceSize offset;
+	VkDeviceSize range;
 	VkDeviceMemory mem;
+	void* pMaped = NULL;
 };
 
 struct XVKFrameBuffer {
@@ -36,14 +39,35 @@ struct XVKVert {
 	float u, v;
 };
 
-struct XVKDescriptorSet {
-	VkDescriptorSet descSet;
-	VkDescriptorSetLayoutCreateInfo info;
-	VkWriteDescriptorSet* writes = NULL;
+//diffuse管线对应的descriptorset，基本功能：1，顶点变换，2，贴图
+struct XVKDescriptorSetBase {
+	
+	XVKDescriptorSetBase();
+	~XVKDescriptorSetBase();
 
-	void UpdateDescriptorSet();
+	VkDescriptorSetLayoutCreateInfo layoutInfo;
+	VkDescriptorSet descSet;
+
+	void SetMvp(glm::mat4* mvp);
+
+	void SetImage(int binding, VkImageView imageView);
+
+private:
+	//1,uniform buffer
+	XVkBuffer uniformBuffer;
+	
+	glm::mat4 mvp;
+
+	//2,image
+	VkDescriptorImageInfo imageInfo;
+
 };
 
+struct XVKBasePipeline {
+	VkPipeline pipeline;
+	
+	XVKDescriptorSetBase xvkDescSet;
+};
 #pragma endregion
 
 
@@ -122,7 +146,7 @@ private:
 
 	void CreateDescriptorSet(VkDescriptorSetLayout setLayout, VkDescriptorSet& descSet);
 
-	void CreatePiplineLayout(int vsDescriptorCnt, int psDescriptorCnt, VkPipelineLayout& pipLayout, XVKDescriptorSet& xvkDescriptorSet);
+	void CreatePiplineLayout(int vsDescriptorCnt, int psDescriptorCnt, VkPipelineLayout& pipLayout, XVKDescriptorSetBase& xvkDescriptorSet);
 
 	void CreateShaderStages(char* vsCode, uint vsLen, char* psCode, uint psLen, VkPipelineShaderStageCreateInfo* pStagesInfo);
 
@@ -133,11 +157,13 @@ public:
 
 	void Setup();
 
-	void CreateBuffer(UINT size, VkBufferUsageFlagBits usage, VkMemoryPropertyFlagBits memMask, OUT XVkBuffer& xvkBuffer);
+	void CreateBuffer(UINT size, VkBufferUsageFlagBits usage, VkFlags memMask, OUT XVkBuffer& xvkBuffer);
 	void WriteBuffer(XVkBuffer xvkBuffer, void* pdata, UINT size, UINT offset);
 	void FreeBuffer(XVkBuffer xvkBuffer);
 
-	void CreateDiffusePipeline(char* vsCode, uint vsLen, char* psCode, uint psLen, VkPipeline& pipeline, XVKDescriptorSet& xvkDescriptorSet);
+	void LoadXImage(const char* file, XVkImage& image);
+
+	void CreateDiffusePipeline(char* vsCode, uint vsLen, char* psCode, uint psLen, VkPipeline& pipeline, XVKDescriptorSetBase& xvkDescriptorSet);
 
 	void SetViewPort(int x, int y, int width, int height);
 

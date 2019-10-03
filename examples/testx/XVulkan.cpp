@@ -162,7 +162,7 @@ void XVulkan::BeginRenderPass()
 
 void XVulkan::Draw(XVkBuffer* pBuff, int vertCnt)
 {
-	vkCmdBindVertexBuffers(vkCmdBuffer, 0, 1, &(pBuff->info.buffer), &(pBuff->info.offset));
+	vkCmdBindVertexBuffers(vkCmdBuffer, 0, 1, &(pBuff->buffer), &(pBuff->offset));
 	vkCmdDraw(vkCmdBuffer, vertCnt, 1, 0, 0);
 }
 
@@ -368,7 +368,7 @@ void XVulkan::Setup()
 *1，xvkBuffer可以是堆变量或栈变量，若写为返回值则只能是堆上申请，因为必须保证它的永久性
 *2，xvkBuffer或作为栈变量返回显然是不行的，因为它不持久
 */
-void XVulkan::CreateBuffer(UINT size, VkBufferUsageFlagBits usage, VkMemoryPropertyFlagBits memMask, OUT XVkBuffer& xvkBuffer)
+void XVulkan::CreateBuffer(UINT size, VkBufferUsageFlagBits usage, VkFlags memMask, OUT XVkBuffer& xvkBuffer)
 {
 	VkBufferCreateInfo info = {};
 	info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
@@ -376,11 +376,11 @@ void XVulkan::CreateBuffer(UINT size, VkBufferUsageFlagBits usage, VkMemoryPrope
 	info.size = size;
 	info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
-	auto ret = vkCreateBuffer(vkDevice, &info, NULL, &xvkBuffer.info.buffer);
+	auto ret = vkCreateBuffer(vkDevice, &info, NULL, &xvkBuffer.buffer);
 	CheckResult(ret);
 
 	VkMemoryRequirements memreqs = {};
-	vkGetBufferMemoryRequirements(vkDevice, xvkBuffer.info.buffer, &memreqs);
+	vkGetBufferMemoryRequirements(vkDevice, xvkBuffer.buffer, &memreqs);
 
 	VkMemoryAllocateInfo alloc = {};
 	alloc.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
@@ -394,7 +394,7 @@ void XVulkan::CreateBuffer(UINT size, VkBufferUsageFlagBits usage, VkMemoryPrope
 	ret = vkAllocateMemory(vkDevice, &alloc, NULL, &xvkBuffer.mem);
 	CheckResult(ret);
 
-	ret = vkBindBufferMemory(vkDevice, xvkBuffer.info.buffer, xvkBuffer.mem, 0);
+	ret = vkBindBufferMemory(vkDevice, xvkBuffer.buffer, xvkBuffer.mem, 0);
 	CheckResult(ret);
 
 
@@ -418,6 +418,10 @@ void XVulkan::FreeBuffer(XVkBuffer xvkBuffer)
 	
 }
 
+void XVulkan::LoadXImage(const char* file, XVkImage& image)
+{
+}
+
 void XVulkan::CreateDescriptorSet(VkDescriptorSetLayout setLayout, VkDescriptorSet& descSet)
 {
 	VkDescriptorSetAllocateInfo descSetInfo = {};
@@ -430,7 +434,7 @@ void XVulkan::CreateDescriptorSet(VkDescriptorSetLayout setLayout, VkDescriptorS
 }
 
 //创建一个只有VS,PS两个阶段的管线
-void XVulkan::CreatePiplineLayout(int vsDescriptorCnt, int psDescriptorCnt, VkPipelineLayout& pipLayout, XVKDescriptorSet& xvkDescriptorSet)
+void XVulkan::CreatePiplineLayout(int vsDescriptorCnt, int psDescriptorCnt, VkPipelineLayout& pipLayout, XVKDescriptorSetBase& xvkDescriptorSet)
 {
 	/*** descriptorCount 的说明
 	* 如果不为1，则bind的是一个数组，例如：
@@ -453,14 +457,14 @@ void XVulkan::CreatePiplineLayout(int vsDescriptorCnt, int psDescriptorCnt, VkPi
 	//layinfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
 	//layinfo.bindingCount = 2;
 	//layinfo.pBindings = bindings;
-	xvkDescriptorSet.info = {};
-	xvkDescriptorSet.info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-	xvkDescriptorSet.info.bindingCount = 2;
-	xvkDescriptorSet.info.pBindings = bindings;
+	xvkDescriptorSet.layoutInfo = {};
+	xvkDescriptorSet.layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+	xvkDescriptorSet.layoutInfo.bindingCount = 2;
+	xvkDescriptorSet.layoutInfo.pBindings = bindings;
 
 	//1，创建DescriptorSet Layout
 	VkDescriptorSetLayout descSetLayout;
-	VkResult res = vkCreateDescriptorSetLayout(vkDevice, &(xvkDescriptorSet.info), NULL, &descSetLayout);
+	VkResult res = vkCreateDescriptorSetLayout(vkDevice, &(xvkDescriptorSet.layoutInfo), NULL, &descSetLayout);
 	CheckResult(res);
 
 	//2，创建DescriptorSet
@@ -477,7 +481,7 @@ void XVulkan::CreatePiplineLayout(int vsDescriptorCnt, int psDescriptorCnt, VkPi
 }
 
 //漫反射管线
-void XVulkan::CreateDiffusePipeline(char* vsCode, uint vsLen, char* psCode, uint psLen, VkPipeline& pipeline, XVKDescriptorSet& xvkDescriptorSet)
+void XVulkan::CreateDiffusePipeline(char* vsCode, uint vsLen, char* psCode, uint psLen, VkPipeline& pipeline, XVKDescriptorSetBase& xvkDescriptorSet)
 {
 	/*** 关于binding
 	* 顶点格式可以事先声明多套，在使用vkCmdBindVertexBuffer(cmdbuff, firstbinding, bindingcount,pbuffers, offsets)时指定使用哪一套或多套
@@ -815,31 +819,46 @@ void XVulkan::CheckResult(VkResult err)
 	abort();
 }
 
-void XVKDescriptorSet::UpdateDescriptorSet()
+XVKDescriptorSetBase::XVKDescriptorSetBase()
 {
-	if (!writes) {
-		writes = new VkWriteDescriptorSet[info.bindingCount];
+	auto mvpSize = sizeof(mvp);
+	xvk.CreateBuffer(mvpSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, 
+		VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT|VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uniformBuffer);
 
-	}
+	vkMapMemory(xvk.vkDevice, uniformBuffer.mem, 0, mvpSize, 0, &uniformBuffer.pMaped);
+}
 
-	for (size_t i = 0; i < info.bindingCount; i++)
+XVKDescriptorSetBase::~XVKDescriptorSetBase()
+{
+	vkUnmapMemory(xvk.vkDevice, uniformBuffer.mem);
+	vkFreeMemory(xvk.vkDevice, uniformBuffer.mem, NULL);
+	vkDestroyBuffer(xvk.vkDevice, uniformBuffer.buffer, NULL);
+}
+
+void XVKDescriptorSetBase::SetMvp(glm::mat4* mvp)
+{
+	memcpy(uniformBuffer.pMaped, mvp, sizeof(*mvp));
+}
+
+void XVKDescriptorSetBase::SetImage(int binding, VkImageView imageView)
+{
+	imageInfo.imageView = imageView;
+
+	for (size_t i = 0; i < layoutInfo.bindingCount; i++)
 	{
-		auto layoutBinding = info.pBindings[i];
-		writes[i] = {};
-		writes[i].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-		writes[i].dstSet = descSet;
-		writes[i].dstBinding = layoutBinding.binding;
-		writes[i].descriptorType = layoutBinding.descriptorType;
-		writes[i].descriptorCount = layoutBinding.descriptorCount; //如果不为1则对应数组
-		writes[i].dstArrayElement = 0; //从数组的第一个元素开始写，非数组类型可视为只有一个元素的数组
+		auto bind = layoutInfo.pBindings[i];
+		if (binding == bind.binding) {
 
-		if (layoutBinding.descriptorType == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER) {
-			//writes[i].pBufferInfo = 
-		}
-		else if (layoutBinding.descriptorType == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER) {//todo 类型判断不严谨，需完善
+			VkWriteDescriptorSet write = {};
+			write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+			write.dstSet = descSet;
+			write.dstBinding = binding;
+			write.descriptorType = bind.descriptorType;
+			write.descriptorCount = bind.descriptorCount;
+			write.pImageInfo = &imageInfo;
 
+			vkUpdateDescriptorSets(xvk.vkDevice, 1, &write, 0, NULL);
+			break;
 		}
 	}
-
-
 }
