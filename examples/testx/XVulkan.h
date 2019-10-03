@@ -138,7 +138,7 @@ private:
 
 #pragma region ¹¤¾ßº¯Êý
 
-	bool memory_type_from_properties(uint32_t typeBits, VkFlags requirements_mask, uint32_t* typeIndex);
+	bool FindMemoryType(uint32_t typeBits, VkFlags requirements_mask, uint32_t* typeIndex);
 
 	void AcquireNextImage(VkSwapchainKHR swapChain, UINT* imgIdx);
 
@@ -150,6 +150,7 @@ private:
 
 	void CreateShaderStages(char* vsCode, uint vsLen, char* psCode, uint psLen, VkPipelineShaderStageCreateInfo* pStagesInfo);
 
+	bool IsDepthFormat(VkFormat fmt);
 #pragma endregion
 
 
@@ -161,7 +162,7 @@ public:
 	void WriteBuffer(XVkBuffer xvkBuffer, void* pdata, UINT size, UINT offset);
 	void FreeBuffer(XVkBuffer xvkBuffer);
 
-	void LoadXImage(const char* file, XVkImage& image);
+	bool CreateImage(uint w, uint h, VkFormat fmt, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags props, XVkImage& img);
 
 	void CreateDiffusePipeline(char* vsCode, uint vsLen, char* psCode, uint psLen, XVKPipelineBase& pipelineBase);
 

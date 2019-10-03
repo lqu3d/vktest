@@ -27,6 +27,7 @@
     <ClCompile Include="XGame.cpp" />
     <ClCompile Include="XGameMgr.cpp" />
     <ClCompile Include="XGameObject.cpp" />
+    <ClCompile Include="XImage.cpp" />
     <ClCompile Include="XMaterial.cpp" />
     <ClCompile Include="XMesh.cpp" />
     <ClCompile Include="XModel.cpp" />
@@ -46,6 +47,7 @@
     <ClInclude Include="XGame.h" />
     <ClInclude Include="XGameMgr.h" />
     <ClInclude Include="XGameObject.h" />
+    <ClInclude Include="XImage.h" />
     <ClInclude Include="XMaterial.h" />
     <ClInclude Include="XMesh.h" />
     <ClInclude Include="XModel.h" />
@@ -129,14 +131,14 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>false</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>%VULKAN_SDK%\include;%VULKAN_SDK%\glslang;..\libs;..\libs\glfw\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%VULKAN_SDK%\include;%VULKAN_SDK%\glslang;..\libs;..\libs\glfw\include;..\libs\freeimage\x32;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>%VULKAN_SDK%\lib32;..\libs\glfw\lib-vc2010-32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;legacy_stdio_definitions.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%VULKAN_SDK%\lib32;..\libs\glfw\lib-vc2010-32;..\libs\freeimage\x32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;FreeImage.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;legacy_stdio_definitions.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">

@@ -231,85 +231,29 @@ void XVulkan::InitSwapChain()
 
 void XVulkan::InitDepthBuffer()
 {
-	//step1，创建image
-	VkImageCreateInfo imgInfo = {};
-
-	vkDepth.format = VK_FORMAT_D16_UNORM;
-
 	VkFormatProperties fmtProps;
-	vkGetPhysicalDeviceFormatProperties(vkPhyDevice, vkDepth.format, &fmtProps);
+	VkFormat fmt = VK_FORMAT_D16_UNORM;
 
+	vkGetPhysicalDeviceFormatProperties(vkPhyDevice, fmt, &fmtProps);
+
+	VkImageTiling tiling = VK_IMAGE_TILING_LINEAR;
 	if (fmtProps.linearTilingFeatures & VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT) {
-		imgInfo.tiling = VK_IMAGE_TILING_LINEAR;
+		tiling = VK_IMAGE_TILING_LINEAR;
 	}
 	else if (fmtProps.optimalTilingFeatures & VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT) {
-		imgInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
+		tiling = VK_IMAGE_TILING_OPTIMAL; //在我的机器上，只支持这个格式
 	}
 	else {
-		std::cout << "unsuported depth format " << vkDepth.format << std::endl;
+		std::cout << "unsuported depth format " << fmt << std::endl;
 	}
 
-	imgInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-	imgInfo.imageType = VK_IMAGE_TYPE_2D;
-	imgInfo.format = vkDepth.format;
-	imgInfo.extent.width = xWnd.width;
-	imgInfo.extent.height = xWnd.height;
-	imgInfo.extent.depth = 1;
-	imgInfo.arrayLayers = 1;
-	imgInfo.samples = VK_SAMPLE_COUNT_1_BIT;
-	imgInfo.mipLevels = 1;
-	imgInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-	imgInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-	imgInfo.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
-
-	auto ret = vkCreateImage(vkDevice, &imgInfo, NULL, &vkDepth.image);
-	CheckResult(ret);
-
-	//step2，申请内存
-	VkMemoryRequirements memreqs;
-	vkGetImageMemoryRequirements(vkDevice, vkDepth.image, &memreqs);
-
-	VkMemoryAllocateInfo allocinfo = {};
-	allocinfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-	allocinfo.allocationSize = memreqs.size;
-
-
-	bool pass = memory_type_from_properties(memreqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &allocinfo.memoryTypeIndex);
-
-	if (!pass) {
-		std::cout << "error-memory_type_from_properties" << std::endl;
-		return;
-	}
-
-	ret = vkAllocateMemory(vkDevice, &allocinfo, NULL, &vkDepth.mem);
-	CheckResult(ret);
-
-	ret = vkBindImageMemory(vkDevice, vkDepth.image, vkDepth.mem, 0);
-	CheckResult(ret);
-
-
-	//step3，创建image view，注意，必须在申请了内存之后，否则运行时崩溃
-	VkImageViewCreateInfo viewinfo = {};
-	viewinfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-	viewinfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-	viewinfo.image = vkDepth.image;
-	viewinfo.format = vkDepth.format;
-	viewinfo.components.a = VK_COMPONENT_SWIZZLE_A;
-	viewinfo.components.r = VK_COMPONENT_SWIZZLE_R;
-	viewinfo.components.g = VK_COMPONENT_SWIZZLE_G;
-	viewinfo.components.b = VK_COMPONENT_SWIZZLE_B;
-	viewinfo.subresourceRange.baseMipLevel = 0;
-	viewinfo.subresourceRange.levelCount = 1;
-	viewinfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT;
-	viewinfo.subresourceRange.layerCount = 1;
-	viewinfo.subresourceRange.baseArrayLayer = 0;
-
-	ret = vkCreateImageView(vkDevice, &viewinfo, NULL, &vkDepth.view);
-	CheckResult(ret);
+	VkImageUsageFlags usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
+	VkMemoryPropertyFlags memProp = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
+	CreateImage(xWnd.width, xWnd.height, fmt, tiling, usage, memProp, vkDepth);
 
 }
 
-bool XVulkan::memory_type_from_properties(uint32_t typeBits, VkFlags requirements_mask, uint32_t* typeIndex) {
+bool XVulkan::FindMemoryType(uint32_t typeBits, VkFlags requirements_mask, uint32_t* typeIndex) {
 	vkGetPhysicalDeviceMemoryProperties(vkPhyDevice, &vkPhyDevMemProps);
 
 	// Search memtypes to find first index with those properties
@@ -386,7 +330,7 @@ void XVulkan::CreateBuffer(UINT size, VkBufferUsageFlagBits usage, VkFlags memMa
 	alloc.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 	alloc.allocationSize = memreqs.size;
 
-	if (!memory_type_from_properties(memreqs.memoryTypeBits, memMask, &alloc.memoryTypeIndex)) {
+	if (!FindMemoryType(memreqs.memoryTypeBits, memMask, &alloc.memoryTypeIndex)) {
 		std::cout << "memory_type not found" << std::endl;
 		exit(-1);
 	}
@@ -418,8 +362,73 @@ void XVulkan::FreeBuffer(XVkBuffer xvkBuffer)
 	
 }
 
-void XVulkan::LoadXImage(const char* file, XVkImage& image)
+bool XVulkan::CreateImage(uint w, uint h, VkFormat fmt, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags props, XVkImage& img)
 {
+	img.format = fmt;
+
+	VkImageAspectFlags aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+	if (IsDepthFormat(fmt)) {
+		aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT;
+	}
+
+	//step1，创建image
+	VkImageCreateInfo imgInfo = {};
+	imgInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+	imgInfo.imageType = VK_IMAGE_TYPE_2D;
+	imgInfo.format = fmt;
+	imgInfo.tiling = tiling;
+	imgInfo.extent.width = w;
+	imgInfo.extent.height = h;
+	imgInfo.extent.depth = 1;
+	imgInfo.arrayLayers = 1;
+	imgInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+	imgInfo.mipLevels = 1;
+	imgInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+	imgInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+	imgInfo.usage = usage;
+
+	auto ret = vkCreateImage(vkDevice, &imgInfo, NULL, &img.image);
+	CheckResult(ret);
+
+	//step2，申请内存
+	VkMemoryRequirements memreqs;
+	vkGetImageMemoryRequirements(vkDevice, img.image, &memreqs);
+
+	VkMemoryAllocateInfo allocinfo = {};
+	allocinfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+	allocinfo.allocationSize = memreqs.size;
+
+	bool pass = FindMemoryType(memreqs.memoryTypeBits, props, &allocinfo.memoryTypeIndex);
+	if (!pass) {
+		throw std::runtime_error("找不到相应的内存类型");
+		return false;
+	}
+
+	ret = vkAllocateMemory(vkDevice, &allocinfo, NULL, &img.mem);
+	CheckResult(ret);
+
+	ret = vkBindImageMemory(vkDevice, img.image, img.mem, 0);
+	CheckResult(ret);
+
+
+	//step3，创建image view，注意，必须在申请了内存之后，否则运行时崩溃
+	VkImageViewCreateInfo viewinfo = {};
+	viewinfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+	viewinfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+	viewinfo.image = img.image;
+	viewinfo.format = img.format;
+	viewinfo.components.a = VK_COMPONENT_SWIZZLE_A;
+	viewinfo.components.r = VK_COMPONENT_SWIZZLE_R;
+	viewinfo.components.g = VK_COMPONENT_SWIZZLE_G;
+	viewinfo.components.b = VK_COMPONENT_SWIZZLE_B;
+	viewinfo.subresourceRange.baseMipLevel = 0;
+	viewinfo.subresourceRange.levelCount = 1;
+	viewinfo.subresourceRange.aspectMask = aspectMask;
+	viewinfo.subresourceRange.layerCount = 1;
+	viewinfo.subresourceRange.baseArrayLayer = 0;
+
+	ret = vkCreateImageView(vkDevice, &viewinfo, NULL, &img.view);
+	CheckResult(ret);
 }
 
 void XVulkan::CreateDescriptorSet(VkDescriptorSetLayout setLayout, VkDescriptorSet& descSet)
@@ -601,6 +610,12 @@ void XVulkan::CreateShaderStages(char* vsCode, uint vsLen, char* psCode, uint ps
 	pStagesInfo[1].stage = VK_SHADER_STAGE_FRAGMENT_BIT;
 	pStagesInfo[1].pName = "psMain";
 	pStagesInfo[1].module = psModule;
+}
+
+bool XVulkan::IsDepthFormat(VkFormat fmt)
+{
+	return (fmt == VK_FORMAT_D16_UNORM || fmt == VK_FORMAT_D16_UNORM_S8_UINT || fmt == VK_FORMAT_D24_UNORM_S8_UINT ||
+		fmt == VK_FORMAT_D32_SFLOAT || fmt == VK_FORMAT_D32_SFLOAT_S8_UINT);
 }
 
 void XVulkan::AcquireNextImage(VkSwapchainKHR swapChain, UINT* imgIdx)

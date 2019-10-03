@@ -69,6 +69,9 @@
     <ClCompile Include="XMaterial.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="XImage.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="XGameMgr.h">
@@ -120,6 +123,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="XMaterial.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="XImage.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
