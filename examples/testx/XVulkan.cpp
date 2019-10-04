@@ -669,12 +669,12 @@ void XVulkan::CreateShaderStages(char* vsCode, uint vsLen, char* psCode, uint ps
 
 	pStagesInfo[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 	pStagesInfo[0].stage = VK_SHADER_STAGE_VERTEX_BIT;
-	pStagesInfo[0].pName = "vsMain";
+	pStagesInfo[0].pName = "main";
 	pStagesInfo[0].module = vsModule;
 
 	pStagesInfo[1].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 	pStagesInfo[1].stage = VK_SHADER_STAGE_FRAGMENT_BIT;
-	pStagesInfo[1].pName = "psMain";
+	pStagesInfo[1].pName = "main";
 	pStagesInfo[1].module = psModule;
 }
 
