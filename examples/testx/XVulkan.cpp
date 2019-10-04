@@ -341,7 +341,7 @@ void XVulkan::CreateBuffer(UINT size, VkBufferUsageFlagBits usage, VkFlags memMa
 	ret = vkBindBufferMemory(vkDevice, xvkBuffer.buffer, xvkBuffer.mem, 0);
 	CheckResult(ret);
 
-
+	xvkBuffer.range = size;
 }
 
 void XVulkan::FreeBuffer(XVkBuffer xvkBuffer)

@@ -8,9 +8,14 @@ class XImage
 
 	XVkImage xvkImage;
 	float width, height;
+
+	bool destroyed = false;
 public:
+	XImage();
+	~XImage();
 
 	bool Load(const char* file, VkImageView& view);
 
+	void Destroy();
 };
 
