@@ -344,18 +344,6 @@ void XVulkan::CreateBuffer(UINT size, VkBufferUsageFlagBits usage, VkFlags memMa
 
 }
 
-void XVulkan::WriteBuffer(XVkBuffer xvkBuffer, void* pdata, UINT size, UINT offset) {
-
-	UINT64* pdat;
-	auto ret = vkMapMemory(vkDevice, xvkBuffer.mem, offset, size, 0, (void**)&pdat);
-	CheckResult(ret);
-
-	memcpy(pdat, pdata, size);
-
-	vkUnmapMemory(vkDevice, xvkBuffer.mem);
-
-}
-
 void XVulkan::FreeBuffer(XVkBuffer xvkBuffer)
 {
 	vkFreeMemory(vkDevice, xvkBuffer.mem, NULL);

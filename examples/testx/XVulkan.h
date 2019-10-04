@@ -164,7 +164,6 @@ public:
 	void Setup();
 
 	void CreateBuffer(UINT size, VkBufferUsageFlagBits usage, VkFlags memMask, OUT XVkBuffer& xvkBuffer);
-	void WriteBuffer(XVkBuffer xvkBuffer, void* pdata, UINT size, UINT offset);
 	void FreeBuffer(XVkBuffer xvkBuffer);
 
 	bool CreateImage(uint w, uint h, VkFormat fmt, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags props, XVkImage& img);
