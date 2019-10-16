@@ -1,5 +1,7 @@
 #pragma once
 #include "XComponent.h"
+#include "XImage.h"
+
 class XMaterial :
 	public XComponent
 {
@@ -15,6 +17,11 @@ private:
 	uint vsCodeLength;
 	char* pPsCode = NULL;
 	uint psCodeLength;
+
+	XImage* baseMap = NULL;
+	XImage* normalMap = NULL;
+	
+	const char* imageFilePath;
 private:
 	void LoadShader(const char* file, char** ppCode, uint* pLen);
 public:
@@ -38,6 +45,11 @@ public:
 
 	uint GetPsShaderSpirvLength();
 
+	void SetBaseMap(const char* file);
+	XImage* GetBaseMap();
+
+	void SetNormalMap(const char* file);
+	XImage* GetNormalMap();
 };
 
 

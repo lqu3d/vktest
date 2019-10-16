@@ -14,7 +14,7 @@ public:
 	XImage();
 	~XImage();
 
-	bool Load(const char* file, VkImageView& view);
+	bool Load(const char* file);
 
 	void Destroy();
 };

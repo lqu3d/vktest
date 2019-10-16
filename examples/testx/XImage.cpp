@@ -10,7 +10,7 @@ XImage::~XImage()
 	Destroy();
 }
 
-bool XImage::Load(const char* file, VkImageView& view)
+bool XImage::Load(const char* file)
 {
 	//step1, ╪стьм╪ф╛нд╪Ч
 	auto fif =FreeImage_GetFileType(file, 0);

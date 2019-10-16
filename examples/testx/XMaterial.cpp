@@ -85,4 +85,32 @@ uint XMaterial::GetPsShaderSpirvLength()
 	return psCodeLength;
 }
 
+void XMaterial::SetBaseMap(const char* file)
+{
+	if (!strcmp(file, imageFilePath))
+		return;
+
+	baseMap->Destroy();
+	X_OBJ_RELEASE(baseMap);
+
+	baseMap = new XImage();
+	baseMap->Load(file);
+
+
+}
+
+XImage* XMaterial::GetBaseMap()
+{
+	return nullptr;
+}
+
+void XMaterial::SetNormalMap(const char* file)
+{
+}
+
+XImage* XMaterial::GetNormalMap()
+{
+	return nullptr;
+}
+
 
